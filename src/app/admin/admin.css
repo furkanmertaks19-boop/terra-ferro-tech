@@ -1,0 +1,200 @@
+.admin-app {
+  --admin-bg: #f3eee4;
+  --admin-bg-2: #ebe4d6;
+  --admin-bg-3: #ffffff;
+  --admin-surface: #ffffff;
+  --admin-surface-2: #f8f4ec;
+  --admin-glass: rgba(255, 255, 255, 0.86);
+  --admin-border: rgba(20, 23, 28, 0.12);
+  --admin-border-strong: rgba(20, 23, 28, 0.2);
+  --admin-text: #14171c;
+  --admin-text-2: #4d5561;
+  --admin-muted: #66707e;
+  --admin-accent: #c4962c;
+  --admin-accent-2: #a67b1d;
+  --admin-accent-ink: #1a1404;
+  --admin-success: #1f8a64;
+  --admin-warning: #b7791f;
+  --admin-danger: #b42318;
+  --admin-info: #2f6fbd;
+  --admin-shadow: 0 16px 40px rgb(20 23 28 / 0.08);
+  --admin-radius-sm: 6px;
+  --admin-radius: 10px;
+  --admin-radius-lg: 14px;
+  --admin-focus: 0 0 0 3px rgb(196 150 44 / 0.28);
+  --radius-sm: var(--admin-radius-sm);
+  --radius-md: var(--admin-radius);
+  --radius-lg: var(--admin-radius-lg);
+  --shadow-glass: var(--admin-shadow);
+  color: var(--admin-text);
+  background:
+    radial-gradient(1000px 420px at 8% -12%, rgb(216 169 54 / 0.14), transparent 48%),
+    var(--admin-bg);
+  min-height: 100dvh;
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+}
+
+.admin-app *,
+.admin-app *::before,
+.admin-app *::after {
+  box-sizing: border-box;
+}
+
+.admin-app a {
+  color: inherit;
+}
+
+.admin-app :focus-visible {
+  outline: none;
+  box-shadow: var(--admin-focus);
+}
+
+.admin-glass {
+  background: var(--admin-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--admin-border);
+}
+
+.admin-panel {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+
+.admin-input,
+.admin-select,
+.admin-textarea {
+  width: 100%;
+  border: 1px solid var(--admin-border-strong);
+  background: var(--admin-bg-3);
+  color: var(--admin-text);
+  border-radius: var(--admin-radius-sm);
+  padding: 0.62rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.admin-input::placeholder,
+.admin-textarea::placeholder {
+  color: var(--admin-muted);
+}
+
+.admin-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--admin-text-2);
+}
+
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0 0.9rem;
+  border-radius: var(--admin-radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.admin-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  color: var(--admin-text-2);
+}
+
+.admin-btn-primary {
+  background: var(--admin-accent);
+  color: var(--admin-accent-ink);
+}
+
+.admin-btn-primary:hover:not(:disabled) {
+  background: var(--admin-accent-2);
+}
+
+.admin-btn-ghost {
+  background: transparent;
+  border-color: var(--admin-border-strong);
+  color: var(--admin-text);
+}
+
+.admin-btn-ghost:hover:not(:disabled) {
+  background: var(--admin-surface-2);
+}
+
+.admin-btn-danger {
+  background: rgb(180 35 24 / 0.08);
+  color: var(--admin-danger);
+  border-color: rgb(180 35 24 / 0.28);
+}
+
+.admin-kbd {
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  padding: 0 0.3rem;
+  font-size: 0.7rem;
+  color: var(--admin-muted);
+}
+
+.admin-select option {
+  background: var(--admin-bg-3);
+  color: var(--admin-text);
+}
+
+.admin-app input[type="checkbox"] {
+  accent-color: var(--admin-accent);
+  width: 1rem;
+  height: 1rem;
+}
+
+.admin-skeleton {
+  background: linear-gradient(90deg, var(--admin-surface), var(--admin-surface-2), var(--admin-surface));
+  background-size: 200% 100%;
+  animation: admin-shimmer 1.4s ease infinite;
+  border-radius: var(--admin-radius-sm);
+}
+
+@keyframes admin-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.prose-admin .tiptap {
+  color: var(--admin-text);
+  min-height: 9rem;
+}
+.prose-admin .tiptap p {
+  margin: 0.35rem 0;
+}
+.prose-admin .tiptap h2 {
+  font-size: 1.15rem;
+  margin: 0.7rem 0 0.35rem;
+}
+.prose-admin .tiptap a {
+  color: var(--admin-accent-2);
+}
+.prose-admin .tiptap p.is-editor-empty:first-child::before {
+  color: var(--admin-muted);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.admin-app main {
+  max-width: 1440px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-app * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

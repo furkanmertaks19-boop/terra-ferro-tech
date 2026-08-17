@@ -1,0 +1,335 @@
+// Terra Ferro Tech — Prisma schema
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Category {
+  TRACTOR
+  EQUIPMENT
+}
+
+enum Theme {
+  TRACTOR_THEME
+  EQUIPMENT_THEME
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  COMPLETED
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  category  Category
+  theme     Theme
+  /// Public product page layout. Values: tractor-cinematic, tractor-technical,
+  /// equipment-showcase, equipment-technical.
+  template  String   @default("tractor-cinematic")
+  status    ProductStatus @default(DRAFT)
+  featured  Boolean  @default(false)
+  publishedAt DateTime?
+  hasUnpublishedChanges Boolean @default(false)
+  draftRevision Json?
+  /// AUTO | COVER | CONTAIN — cinematic/hero image fit.
+  heroImageMode String @default("AUTO")
+  /// Internal manufacturer page. Never shown on the public site.
+  referenceUrl String?
+
+  series      String
+  subcategory String?
+  name        String
+  fullTitle   String
+
+  stage       String?
+  horsePower  Float?
+  hasCabin    Boolean @default(false)
+
+  dealerPrice Decimal @db.Decimal(10, 2)
+  retailPrice Decimal @db.Decimal(10, 2)
+
+  isCampaign      Boolean @default(false)
+  isNew           Boolean @default(false)
+  /// Optional public badge text. Empty = hidden.
+  customBadge     String?
+  /// red | black | gold | gray
+  customBadgeTone String?
+  showPriceOnSite Boolean @default(false)
+
+  shortDescription String?
+  description      String? @db.Text
+  specs            Json    @default("{}")
+  specGroups       Json?
+  contentBlocks    Json    @default("[]")
+  imageAlts        Json    @default("{}")
+  seoTitle         String?
+  seoDescription   String?
+  coverImage       String?
+  images           String[]
+
+  technicalPdfUrl      String?
+  technicalPdfPublicId String?
+  technicalPdfName     String?
+  technicalPdfSize     Int?
+  showTechnicalPdf     Boolean @default(false)
+
+  slug String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads Lead[]
+
+  @@index([category])
+  @@index([series])
+  @@index([status])
+  @@index([featured])
+  @@index([template])
+  @@index([subcategory])
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  message   String?    @db.Text
+  status    LeadStatus @default(NEW)
+
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId String?
+
+  createdAt DateTime @default(now())
+}
+
+model HomeSlide {
+  id        String @id @default(cuid())
+  eyebrow   String @default("")
+  title     String
+  subtitle  String @default("") @db.Text
+
+  desktopImage String
+  mobileImage  String?
+
+  primaryButtonText   String @default("")
+  primaryButtonUrl    String @default("")
+  secondaryButtonText String @default("")
+  secondaryButtonUrl  String @default("")
+
+  /// Presets: left-center, left-bottom, center, right-center
+  contentPosition String @default("left-center")
+  overlayOpacity  Int    @default(55)
+  isActive        Boolean @default(true)
+  sortOrder       Int     @default(0)
+  autoplayDuration Int    @default(7000)
+  /// home | traktoret | makineri — which public page shows this slide
+  pageKey         String @default("home")
+
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@index([pageKey, isActive, sortOrder])
+}
+
+model CategoryPage {
+  id       String   @id @default(cuid())
+  category Category @unique
+
+  eyebrow  String @default("")
+  title    String
+  subtitle String @default("") @db.Text
+
+  desktopImage String @default("")
+  mobileImage  String?
+
+  overlayOpacity Int    @default(45)
+  textPosition   String @default("left")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  id          String @id @default("default")
+  companyName String
+  email       String
+  phone       String
+  phoneHref   String
+  location    String
+  mapEmbedUrl String @db.Text
+  website     String @default("www.terraferrotech.com")
+  whatsapp    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductCategory {
+  id       String   @id @default(cuid())
+  kind     Category
+  parentId String?
+  parent   ProductCategory?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children ProductCategory[] @relation("CategoryTree")
+
+  name      String
+  slug      String
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([kind, slug])
+  @@index([kind, parentId, sortOrder])
+}
+
+model HomeSection {
+  id      String @id @default(cuid())
+  type    String
+  variant String @default("default")
+
+  title   String @default("")
+  eyebrow String @default("")
+  body    String @default("") @db.Text
+
+  image       String?
+  mobileImage String?
+
+  ctaLabel String @default("")
+  ctaHref  String @default("")
+
+  config    Json    @default("{}")
+  sortOrder Int     @default(0)
+  isVisible Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder, isVisible])
+}
+
+enum GalleryItemType {
+  IMAGE
+  VIDEO
+}
+
+model GalleryCategory {
+  id        String        @id @default(cuid())
+  name      String
+  slug      String        @unique
+  sortOrder Int           @default(0)
+  items     GalleryItem[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([sortOrder])
+}
+
+model GalleryItem {
+  id             String           @id @default(cuid())
+  type           GalleryItemType
+  title          String?
+  description    String?          @db.Text
+  categoryId     String?
+  category       GalleryCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  mediaUrl       String
+  publicId       String?
+  thumbnailUrl   String?
+  posterPublicId String?
+  altText        String?
+  sortOrder      Int              @default(0)
+  isPublished    Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([isPublished, sortOrder])
+  @@index([type, isPublished])
+  @@index([categoryId])
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  name                String
+  email               String    @unique
+  username            String?   @unique
+  passwordHash        String
+  role                UserRole  @default(EDITOR)
+  isActive            Boolean   @default(true)
+  mustChangePassword  Boolean   @default(false)
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  passwordChangedAt   DateTime?
+  sessionVersion      Int       @default(1)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([role])
+  @@index([isActive])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String?
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action])
+  @@index([userId])
+}
+
+model PageContent {
+  id      String @id @default(cuid())
+  pageKey String @unique
+
+  eyebrow     String @default("")
+  title       String @default("")
+  description String @default("") @db.Text
+
+  heroType       String  @default("image")
+  heroImage      String  @default("")
+  mobileImage    String?
+  overlayOpacity Int     @default(45)
+  textPosition   String  @default("left")
+  heroHeight     String  @default("standard")
+  slides         Json    @default("[]")
+  config         Json    @default("{}")
+
+  status                  String  @default("PUBLISHED")
+  draftRevision           Json?
+  hasUnpublishedChanges   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

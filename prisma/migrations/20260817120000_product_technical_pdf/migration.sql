@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "technicalPdfUrl" TEXT;
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "technicalPdfPublicId" TEXT;
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "technicalPdfName" TEXT;
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "technicalPdfSize" INTEGER;
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "showTechnicalPdf" BOOLEAN NOT NULL DEFAULT false;

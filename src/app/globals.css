@@ -1,26 +1,269 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #101214;
+  --graphite: #171a1d;
+  --steel: #22262a;
+  --ink-2: #171a1d;
+  --surface: #1b1f23;
+  --surface-2: #22262a;
+  --warm: #f3f0e9;
+  --warm-white: #f3f0e9;
+  --ivory: #eeeae1;
+  --soft-grey: #c6c4bd;
+  --warm-muted: #c6c4bd;
+  --muted: #8c9094;
+  --metal: #a6a8a5;
+  --tractor-red: #c5282f;
+  --tractor-red-dark: #981e24;
+  --red: #c5282f;
+  --red-deep: #981e24;
+  --gold: #a6a8a5;
+  --gold-soft: #c6c4bd;
+  --gold-deep: #8c9094;
+  --line: rgb(243 240 233 / 0.12);
+  --line-strong: rgb(243 240 233 / 0.22);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 180ms;
+  --duration: 360ms;
+  --duration-slow: 700ms;
+  --duration-cinematic: 1100ms;
+
+  --radius-sm: 2px;
+  --radius: 4px;
+
+  --z-header: 50;
+  --z-overlay: 60;
+  --z-modal: 70;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  --section-xs: 48px;
+  --section-sm: 64px;
+  --section-md: 88px;
+  --section-lg: 112px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-graphite: var(--graphite);
+  --color-steel: var(--steel);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-warm: var(--warm);
+  --color-warm-white: var(--warm-white);
+  --color-ivory: var(--ivory);
+  --color-soft-grey: var(--soft-grey);
+  --color-warm-muted: var(--warm-muted);
+  --color-muted: var(--muted);
+  --color-metal: var(--metal);
+  --color-tractor-red: var(--tractor-red);
+  --color-tractor-red-dark: var(--tractor-red-dark);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-deep: var(--gold-deep);
+  --color-line: var(--line);
+
+  --color-background: var(--ink);
+  --color-foreground: var(--warm);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-barlow);
+
+  --color-brand-black: var(--ink);
+  --color-brand-anthracite: var(--surface);
+  --color-brand-anthracite-light: var(--surface-2);
+  --color-brand-red: var(--tractor-red);
+  --color-brand-red-dark: var(--tractor-red-dark);
+  --color-brand-gold: var(--metal);
+  --color-brand-gold-light: var(--soft-grey);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--ink);
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ink);
+  color: var(--warm);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  font-feature-settings: "ss01" 1, "kern" 1;
+}
+
+::selection {
+  background: var(--tractor-red);
+  color: var(--warm);
+}
+
+:focus-visible {
+  outline: 2px solid var(--tractor-red);
+  outline-offset: 3px;
+}
+
+button,
+a[href],
+[role="button"],
+summary {
+  cursor: pointer;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .font-display {
+    font-family: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
+    font-stretch: condensed;
+  }
+
+  .container-site {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1480px;
+    padding-inline: 20px;
+  }
+
+  .section-pad {
+    padding-block: var(--section-xs);
+  }
+
+  .section-pad-sm {
+    padding-block: var(--section-xs);
+  }
+
+  .hairline {
+    border-color: var(--line);
+  }
+
+  .ease-out-expo {
+    transition-timing-function: var(--ease-out);
+  }
+
+  .public-grain {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    opacity: 0.025;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .nav-link {
+    position: relative;
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .nav-link:hover::after,
+  .nav-link[data-active="true"]::after {
+    transform: scaleX(1);
+  }
+
+  .nav-link[data-active="true"]::after {
+    background: var(--tractor-red);
+  }
+
+  .btn-wipe {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .btn-wipe::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--tractor-red-dark);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--duration) var(--ease-out);
+  }
+
+  .btn-wipe:hover::before,
+  .btn-wipe:focus-visible::before {
+    transform: scaleX(1);
+  }
+
+  .btn-wipe-dark::before {
+    background: var(--ink);
+  }
+
+  .btn-wipe-red::before {
+    background: var(--tractor-red);
+  }
+
+  .section-rule {
+    height: 1px;
+    width: 48px;
+    background: var(--tractor-red);
+  }
+}
+
+@media (min-width: 768px) {
+  .container-site {
+    padding-inline: 32px;
+  }
+
+  .section-pad {
+    padding-block: var(--section-md);
+  }
+
+  .section-pad-sm {
+    padding-block: var(--section-sm);
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-site {
+    padding-inline: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .motion-safe-only,
+  .btn-wipe::before,
+  .nav-link::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .btn-wipe::before {
+    transform: none;
+  }
 }

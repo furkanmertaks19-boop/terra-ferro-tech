@@ -1,0 +1,16 @@
+-- CreateEnum
+DO $$ BEGIN
+  CREATE TYPE "LeadStatus" AS ENUM ('NEW', 'CONTACTED', 'QUOTED', 'COMPLETED');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+-- AlterTable Product
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "specGroups" JSONB;
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "contentBlocks" JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "imageAlts" JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "seoTitle" TEXT;
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "seoDescription" TEXT;
+
+-- AlterTable Lead
+ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "status" "LeadStatus" NOT NULL DEFAULT 'NEW';
