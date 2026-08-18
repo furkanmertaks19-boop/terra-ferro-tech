@@ -27,8 +27,11 @@ const schema = z.object({
 export type PageSaveResult = { ok: true } | { ok: false; error: string };
 
 function revalidatePage(key: PageKey) {
+  const path = publicPathFor(key);
   revalidatePath("/", "layout");
-  revalidatePath(publicPathFor(key));
+  revalidatePath(path);
+  revalidatePath(path, "page");
+  revalidatePath(path, "layout");
   revalidatePath("/admin/pages");
   revalidatePath(`/admin/pages/${key}`);
   revalidatePath(`/admin/preview/page/${key}`);

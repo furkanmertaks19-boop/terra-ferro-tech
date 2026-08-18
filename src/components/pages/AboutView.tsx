@@ -1,8 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
-import PageHero from "@/components/pages/PageHero";
-import PageIntro from "@/components/pages/PageIntro";
+import PageBanner from "@/components/pages/PageBanner";
 import { parseAboutConfig, type PublicPageContent } from "@/lib/page-cms";
 import type { PublicSiteSettings } from "@/lib/site-settings";
 
@@ -15,11 +14,9 @@ export default function AboutView({
 }) {
   const config = parseAboutConfig(page.config);
   const features = config.features.filter((item) => item.isActive);
-  const hasHeroMedia = Boolean(page.heroImage) || page.slides.length > 0;
-
   return (
     <div className="bg-ivory text-ink">
-      {hasHeroMedia ? <PageHero page={page} /> : <PageIntro page={page} />}
+      <PageBanner page={page} />
       <section className="py-16 md:py-24">
         <div className="container-site grid gap-12 lg:grid-cols-12 lg:gap-16">
           <Reveal className="lg:col-span-5">

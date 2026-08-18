@@ -1,4 +1,4 @@
-import PageIntro from "@/components/pages/PageIntro";
+import PageBanner from "@/components/pages/PageBanner";
 import ContactForm from "@/components/contact/ContactForm";
 import JsonLd from "@/components/seo/JsonLd";
 import { Reveal } from "@/components/motion/Reveal";
@@ -19,7 +19,7 @@ export default function ContactView({
   return (
     <div className="bg-ivory text-ink">
       <JsonLd data={organizationJsonLd(settings)} />
-      <PageIntro page={page} />
+      <PageBanner page={page} />
       <section className="container-site grid items-start gap-10 py-10 lg:grid-cols-12 lg:gap-14 lg:py-14" aria-labelledby="contact-details">
         <Reveal className="lg:col-span-5">
           <h2 id="contact-details" className="font-display text-3xl font-semibold tracking-tight">

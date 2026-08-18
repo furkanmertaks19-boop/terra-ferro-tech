@@ -128,10 +128,15 @@ export function isHeroHeight(value: string): value is HeroHeight {
 }
 
 export const HERO_HEIGHT_PX: Record<HeroHeight, number> = {
-  compact: 420,
-  standard: 560,
-  tall: 680,
+  compact: 450,
+  standard: 520,
+  tall: 620,
 };
+
+export function pageHasHeroMedia(page: Pick<PublicPageHero, "heroType" | "heroImage" | "slides">) {
+  if (page.heroType === "slider") return page.slides.some((slide) => slide.isActive && slide.image);
+  return Boolean(page.heroImage?.trim());
+}
 
 export function defaultAboutConfig(): AboutConfig {
   return {

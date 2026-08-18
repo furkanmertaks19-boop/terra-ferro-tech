@@ -2,7 +2,7 @@ import { Compass, Handshake, Wrench, Headphones, GearSix } from "@phosphor-icons
 import type { Icon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
-import PageIntro from "@/components/pages/PageIntro";
+import PageBanner from "@/components/pages/PageBanner";
 import { parseServicesConfig, type PublicPageContent } from "@/lib/page-cms";
 
 function serviceIcon(title: string): Icon {
@@ -21,7 +21,7 @@ export default function ServicesView({ page }: { page: PublicPageContent }) {
 
   return (
     <div className="bg-ivory pb-20 text-ink">
-      <PageIntro page={page} />
+      <PageBanner page={page} />
       <section className="container-site pt-8 md:pt-12">
         <div className="divide-y divide-ink/10 border-y border-ink/10">
           {items.map((service, i) => {
