@@ -174,28 +174,18 @@ function MobileFilters({ children }: { children: React.ReactNode }) {
     router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }
 
-  return (
-    <div className="lg:hidden">
-      <button
-        type="button"
-        onClick={() => toggle(true)}
-        className="mb-4 w-full border border-ink/15 bg-white px-4 py-3 text-sm font-semibold"
-      >
-        Filtro
-      </button>
-      {open && (
-        <div className="fixed inset-0 z-[55] flex flex-col justify-end bg-ink/50">
-          <div className="max-h-[85dvh] overflow-y-auto bg-warm p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="font-display text-lg font-semibold">Filtro</p>
-              <button type="button" onClick={() => toggle(false)} className="text-sm">
-                Mbyll
-              </button>
-            </div>
-            {children}
-          </div>
+  return open ? (
+    <div className="fixed inset-0 z-[55] flex flex-col justify-end bg-ink/50 lg:hidden">
+      <button type="button" className="absolute inset-0" aria-label="Mbyll" onClick={() => toggle(false)} />
+      <div className="relative max-h-[85dvh] overflow-y-auto bg-warm p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <p className="font-display text-lg font-semibold">Filtro</p>
+          <button type="button" onClick={() => toggle(false)} className="text-sm">
+            Mbyll
+          </button>
         </div>
-      )}
+        {children}
+      </div>
     </div>
-  );
+  ) : null;
 }

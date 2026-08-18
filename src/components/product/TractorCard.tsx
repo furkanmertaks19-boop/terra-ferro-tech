@@ -16,8 +16,8 @@ export default function TractorCard({ product }: { product: PublicProduct; index
   ].filter(Boolean);
 
   return (
-    <article className="group flex h-full flex-col border border-ink/10 bg-warm-white transition-[border-color] duration-300 ease-out-expo hover:border-tractor-red/45">
-      <Link href={productHref(product)} className="flex flex-1 flex-col">
+    <article className="group flex h-full min-w-0 flex-col border border-ink/10 bg-warm-white transition-[border-color] duration-300 ease-out-expo hover:border-tractor-red/45">
+      <Link href={productHref(product)} className="flex min-w-0 flex-1 flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-[#e8e3d8]">
           <ProductBadges
             isNew={product.isNew}
@@ -31,7 +31,7 @@ export default function TractorCard({ product }: { product: PublicProduct; index
               alt={productImageAlt(product)}
               fill
               sizes="(min-width: 1280px) 24vw, (min-width: 768px) 45vw, 100vw"
-              className="object-contain p-5 transition-transform duration-500 ease-out-expo group-hover:scale-[1.03]"
+              className="object-contain object-center p-4 sm:p-5 transition-transform duration-500 ease-out-expo group-hover:scale-[1.03]"
             />
           ) : (
             <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
@@ -40,20 +40,20 @@ export default function TractorCard({ product }: { product: PublicProduct; index
             </div>
           )}
         </div>
-        <div className="flex flex-1 flex-col px-5 py-5">
+        <div className="flex min-w-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
           {product.series ? (
-            <p className="text-[13px] font-medium tracking-[0.16em] uppercase text-tractor-red">{product.series}</p>
+            <p className="text-[12px] font-medium tracking-[0.16em] uppercase text-tractor-red sm:text-[13px]">{product.series}</p>
           ) : null}
-          <h3 className="mt-2 font-display text-2xl font-semibold tracking-tight">{product.name}</h3>
-          <p className="mt-1 text-base text-ink/55">{parts.join(" · ")}</p>
-          <span className="mt-auto inline-flex items-center gap-2 pt-5 text-[13px] font-semibold tracking-[0.12em] uppercase">
+          <h3 className="mt-2 font-display text-xl font-semibold tracking-tight sm:text-2xl">{product.name}</h3>
+          <p className="mt-1 text-sm text-ink/55 sm:text-base">{parts.join(" · ")}</p>
+          <span className="mt-auto inline-flex items-center gap-2 pt-4 text-[12px] font-semibold tracking-[0.12em] uppercase sm:pt-5 sm:text-[13px]">
             Shiko Modelin
             <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>
         </div>
       </Link>
-      <div className="border-t border-ink/10 px-5 py-3">
-        <QuoteButton productId={product.id} productLabel={product.fullTitle} className="w-full" />
+      <div className="border-t border-ink/10 px-4 py-3 sm:px-5">
+        <QuoteButton productId={product.id} productLabel={product.fullTitle} className="w-full min-w-0 px-3 py-2.5 sm:px-5 sm:py-3" />
       </div>
     </article>
   );

@@ -28,7 +28,7 @@ export default function EquipmentListing({
 
       {groups.length > 0 && (
         <div className="border-y border-ink/10 bg-warm-white">
-          <div className="container-site flex gap-6 overflow-x-auto py-4">
+          <div className="container-site flex flex-wrap gap-x-5 gap-y-2 py-3">
             <GroupChip href="/makineri-bujqesore" label="Të gjitha" active={!subcategory && !group} />
             {groups.map((item) => (
               <GroupChip
@@ -42,12 +42,12 @@ export default function EquipmentListing({
         </div>
       )}
 
-      <div className="mx-auto w-full max-w-[1400px] px-5 py-8 md:px-8 lg:py-10">
+      <div className="mx-auto w-full max-w-[1400px] min-w-0 px-4 py-6 md:px-8 lg:py-10">
         <h2 className="sr-only">Makineri bujqësore</h2>
-        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <p className="text-base text-ink/55">
-            {products.length} {products.length === 1 ? "pajisje" : "pajisje"}
-          </p>
+        <p className="mb-3 text-sm text-ink/55">
+          {products.length} {products.length === 1 ? "pajisje" : "pajisje"}
+        </p>
+        <div className="mb-5">
           <Suspense>
             <CatalogToolbar hideHp hidePrice searchPlaceholder="Kërko makineri..." />
           </Suspense>
@@ -69,8 +69,8 @@ function GroupChip({ href, label, active }: { href: string; label: string; activ
   return (
     <Link
       href={href}
-      className={`shrink-0 border-b-2 pb-2 text-[13px] font-semibold tracking-[0.12em] uppercase ${
-        active ? "border-tractor-red text-tractor-red" : "border-transparent text-ink/55 hover:text-ink"
+      className={`pb-1 text-[12px] font-semibold tracking-[0.12em] uppercase ${
+        active ? "border-b-2 border-tractor-red text-tractor-red" : "border-b-2 border-transparent text-ink/55 hover:text-ink"
       }`}
     >
       {label}

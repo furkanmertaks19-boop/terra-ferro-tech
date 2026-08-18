@@ -21,21 +21,19 @@ export default function TractorsListing({
     <div className="bg-ivory text-ink">
       <PageHero page={hero} />
 
-      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-5 py-8 md:px-8 lg:flex-row lg:py-10">
+      <div className="mx-auto flex w-full max-w-[1400px] min-w-0 flex-col gap-6 px-4 py-6 md:px-8 lg:flex-row lg:gap-8 lg:py-10">
         <Suspense>
           <TractorFilters seriesOptions={seriesOptions} stageOptions={stageOptions} hideSearch />
         </Suspense>
 
         <div className="min-w-0 flex-1">
           <h2 className="sr-only">Modelet e traktorëve</h2>
-          <div className="mb-6">
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <p className="text-base text-ink/55">
-                {products.length} {products.length === 1 ? "model" : "modele"}
-              </p>
-            </div>
+          <p className="mb-3 text-sm text-ink/55">
+            {products.length} {products.length === 1 ? "model" : "modele"}
+          </p>
+          <div className="mb-5">
             <Suspense>
-              <CatalogToolbar hidePrice searchPlaceholder="Kërko traktor..." />
+              <CatalogToolbar hidePrice showFilters searchPlaceholder="Kërko traktor..." />
             </Suspense>
           </div>
 
