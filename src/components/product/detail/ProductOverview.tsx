@@ -7,6 +7,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import ProductContentBlocks from "@/components/product/ProductContentBlocks";
 import { productBody, productContainer, productEyebrow, productSection, productTitle } from "./product-shell";
 import { t } from "@/lib/i18n";
+import { productImageAlt } from "@/lib/seo";
 
 export default function ProductOverview({ product }: { product: PublicProduct }) {
   const overview = product.description?.trim() || null;
@@ -43,7 +44,7 @@ export default function ProductOverview({ product }: { product: PublicProduct })
             <div className="relative min-h-[280px] overflow-hidden border border-ink/[0.08] bg-[#ece8de] shadow-[0_18px_40px_-24px_rgba(28,24,18,0.3)] md:min-h-[420px]">
               <Image
                 src={cinematicGalleryUrl(image)}
-                alt={product.fullTitle}
+                alt={productImageAlt(product)}
                 fill
                 className="object-contain p-8"
                 sizes="(min-width: 1024px) 42vw, 100vw"

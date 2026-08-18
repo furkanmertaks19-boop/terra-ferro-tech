@@ -128,7 +128,7 @@ export default function HeroSlider({ slides }: { slides: PublicHeroSlide[] }) {
                   <button
                     key={item.id}
                     type="button"
-                    aria-label={`Slide ${i + 1}`}
+                    aria-label={item.title || `Slide ${i + 1}`}
                     aria-current={i === index ? true : undefined}
                     onClick={() => goTo(i)}
                     className={`relative h-px overflow-hidden bg-warm/25 ${i === index ? "w-16" : "w-6"}`}

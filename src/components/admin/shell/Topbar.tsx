@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { List, MagnifyingGlass, Plus } from "@phosphor-icons/react";
 import { logoutAction } from "@/lib/actions/auth";
+import { NotificationBell } from "./AdminNotifications";
 
 const TITLES: Record<string, string> = {
   "/admin": "Panel",
@@ -51,7 +52,7 @@ export default function Topbar({
     });
 
   return (
-    <header className="admin-glass sticky top-0 z-40 flex min-h-16 items-center justify-between gap-4 px-4 py-3 lg:px-6">
+    <header className="sticky top-0 z-40 flex min-h-16 items-center justify-between gap-4 border-b border-[var(--admin-border)] bg-white px-4 py-3 lg:px-6">
       <div className="flex min-w-0 items-center gap-3">
         <button type="button" className="admin-btn admin-btn-ghost lg:hidden" onClick={onMenu} aria-label="Menüyü aç">
           <List size={18} />
@@ -81,6 +82,7 @@ export default function Topbar({
           <Plus size={16} />
           <span className="hidden sm:inline">Hızlı Ekle</span>
         </button>
+        <NotificationBell key={pathname} />
         <div className="relative group">
           <button type="button" className="admin-btn admin-btn-ghost text-left" aria-haspopup="menu" aria-label="Hesap menüsü">
             <span className="block text-sm leading-tight">{userName}</span>

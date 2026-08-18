@@ -5,6 +5,7 @@ import { productHref } from "@/lib/product-path";
 import { coverUrl, type PublicProduct } from "@/lib/types";
 import ProductBadges from "./ProductBadges";
 import QuoteButton from "./QuoteButton";
+import { productImageAlt } from "@/lib/seo";
 
 export default function TractorCard({ product }: { product: PublicProduct; index?: number }) {
   const cover = coverUrl(product);
@@ -27,7 +28,7 @@ export default function TractorCard({ product }: { product: PublicProduct; index
           {cover ? (
             <Image
               src={cover}
-              alt={product.fullTitle}
+              alt={productImageAlt(product)}
               fill
               sizes="(min-width: 1280px) 24vw, (min-width: 768px) 45vw, 100vw"
               className="object-contain p-5 transition-transform duration-500 ease-out-expo group-hover:scale-[1.03]"

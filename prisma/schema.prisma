@@ -34,6 +34,19 @@ enum LeadStatus {
   COMPLETED
 }
 
+enum UsedTractorStatus {
+  DRAFT
+  FOR_SALE
+  RESERVED
+  SOLD
+  ARCHIVED
+}
+
+enum UsedTractorDrive {
+  FOUR_WD
+  TWO_WD
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN
@@ -96,6 +109,9 @@ model Product {
 
   slug String @unique
 
+  /// Manual catalog order, independent per category.
+  sortOrder Int @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -107,6 +123,7 @@ model Product {
   @@index([featured])
   @@index([template])
   @@index([subcategory])
+  @@index([category, sortOrder])
 }
 
 model Lead {
@@ -116,11 +133,19 @@ model Lead {
   email     String?
   message   String?    @db.Text
   status    LeadStatus @default(NEW)
+  readAt    DateTime?
 
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   productId String?
 
+  usedTractor   UsedTractor? @relation(fields: [usedTractorId], references: [id], onDelete: SetNull)
+  usedTractorId String?
+
   createdAt DateTime @default(now())
+
+  @@index([readAt])
+  @@index([createdAt])
+  @@index([usedTractorId])
 }
 
 model HomeSlide {
@@ -184,9 +209,59 @@ model SiteSettings {
   mapEmbedUrl String @db.Text
   website     String @default("www.terraferrotech.com")
   whatsapp    String
+  /// Public used-tractor catalog. Off by default; existing inventory is kept.
+  usedTractorsEnabled Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model UsedTractor {
+  id     String            @id @default(cuid())
+  status UsedTractorStatus @default(DRAFT)
+
+  brand  String
+  model  String
+  slug   String @unique
+  year   Int?
+  hours  Int?
+  horsePower Float?
+  fuelType String?
+  hasCabin Boolean @default(false)
+  transmission String?
+  drive UsedTractorDrive?
+  location String?
+
+  shortDescription String?
+  description      String? @db.Text
+  specs            Json    @default("{}")
+
+  coverImage String?
+  images     String[]
+  imageAlts  Json    @default("{}")
+
+  technicalPdfUrl      String?
+  technicalPdfPublicId String?
+  technicalPdfName     String?
+  technicalPdfSize     Int?
+
+  /// Admin-only. Not shown on the public site unless explicitly enabled later.
+  price           Decimal? @db.Decimal(10, 2)
+  showPriceOnSite Boolean  @default(false)
+
+  seoTitle       String?
+  seoDescription String?
+
+  sortOrder   Int       @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  leads Lead[]
+
+  @@index([status])
+  @@index([sortOrder])
+  @@index([brand])
 }
 
 model ProductCategory {

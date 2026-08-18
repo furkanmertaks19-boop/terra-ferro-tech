@@ -53,6 +53,7 @@ export type ContactConfig = {
   nameLabel: string;
   phoneLabel: string;
   emailLabel: string;
+  subjectLabel: string;
   messageLabel: string;
 };
 
@@ -176,6 +177,7 @@ export function defaultContactConfig(): ContactConfig {
     nameLabel: "Emri dhe mbiemri",
     phoneLabel: "Telefoni",
     emailLabel: "Email",
+    subjectLabel: "Subjekti",
     messageLabel: "Mesazhi",
   };
 }
@@ -355,6 +357,7 @@ export function parseContactConfig(value: unknown): ContactConfig {
     nameLabel: typeof raw.nameLabel === "string" && raw.nameLabel ? raw.nameLabel : fallback.nameLabel,
     phoneLabel: typeof raw.phoneLabel === "string" && raw.phoneLabel ? raw.phoneLabel : fallback.phoneLabel,
     emailLabel: typeof raw.emailLabel === "string" && raw.emailLabel ? raw.emailLabel : fallback.emailLabel,
+    subjectLabel: typeof raw.subjectLabel === "string" && raw.subjectLabel ? raw.subjectLabel : fallback.subjectLabel,
     messageLabel: typeof raw.messageLabel === "string" && raw.messageLabel ? raw.messageLabel : fallback.messageLabel,
   };
 }

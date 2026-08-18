@@ -1,4 +1,4 @@
-import PageHero from "@/components/pages/PageHero";
+import PageIntro from "@/components/pages/PageIntro";
 import GalleryExperience from "@/components/gallery/GalleryExperience";
 import { parseGalleryConfig, type PublicPageContent } from "@/lib/page-cms";
 import type { PublicGalleryCategory, PublicGalleryItem } from "@/lib/gallery";
@@ -14,9 +14,9 @@ export default function GalleryView({
 }) {
   const config = parseGalleryConfig(page.config);
   return (
-    <div className="bg-ink pb-24 text-warm">
-      <PageHero page={page} />
-      <section className="container-site pt-10 md:pt-14">
+    <div className="bg-ivory pb-20 text-ink">
+      <PageIntro page={page} />
+      <section className="container-site pt-8 md:pt-10">
         <GalleryExperience items={items} categories={categories} showFilters={config.showFilters} />
       </section>
     </div>

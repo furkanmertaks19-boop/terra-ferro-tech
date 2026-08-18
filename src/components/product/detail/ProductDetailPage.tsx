@@ -9,6 +9,8 @@ import ProductFeatureList from "./ProductFeatureList";
 import ProductGallerySection from "./ProductGallery";
 import ProductPdfCard from "./ProductPdfCard";
 import ProductOfferCta from "./ProductOfferCta";
+import JsonLd from "@/components/seo/JsonLd";
+import { productBreadcrumbJsonLd, productJsonLd } from "@/lib/seo";
 
 export default function ProductDetailPage({
   product,
@@ -19,6 +21,8 @@ export default function ProductDetailPage({
 }) {
   return (
     <article className="bg-ivory pb-20 text-ink lg:pb-0">
+      <JsonLd data={productJsonLd(product)} />
+      <JsonLd data={productBreadcrumbJsonLd(product)} />
       <ProductHero product={product} />
       <ProductHighlights product={product} />
       <ProductOverview product={product} />

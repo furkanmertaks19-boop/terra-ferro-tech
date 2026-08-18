@@ -6,6 +6,7 @@ import { SectionIndex } from "@/components/ui/SectionIndex";
 import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
 import { productHref } from "@/lib/product-path";
+import { productImageAlt } from "@/lib/seo";
 
 const SPEC_KEYS = [
   { key: "Motori", title: "Motori" },
@@ -37,7 +38,7 @@ export default function EngineeringStory({ product }: { product: PublicProduct }
               {cover ? (
                 <Image
                   src={cover}
-                  alt={product.fullTitle}
+                  alt={productImageAlt(product)}
                   fill
                   sizes="40vw"
                   className="object-contain p-8"
@@ -54,7 +55,7 @@ export default function EngineeringStory({ product }: { product: PublicProduct }
           <div className="lg:col-span-7">
             <div className="relative mb-10 min-h-[280px] bg-steel lg:hidden">
               {cover ? (
-                <Image src={cover} alt={product.fullTitle} fill sizes="100vw" className="object-contain p-6" />
+                <Image src={cover} alt={productImageAlt(product)} fill sizes="100vw" className="object-contain p-6" />
               ) : null}
             </div>
             {items.map((item, i) => (

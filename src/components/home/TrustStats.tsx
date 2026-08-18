@@ -8,7 +8,7 @@ export default function TrustStats() {
   if (!TRUST_STATS.enabled || TRUST_STATS.items.length === 0) return null;
 
   return (
-    <section className="border-y border-warm/10 bg-ink py-16">
+    <section className="border-y border-ink/8 bg-white py-16">
       <div className="container-site grid gap-10 sm:grid-cols-3">
         {TRUST_STATS.items.map((item) => (
           <Stat key={item.label} value={item.value} suffix={item.suffix} label={item.label} />
@@ -40,7 +40,7 @@ function Stat({ value, suffix, label }: { value: number; suffix: string; label: 
         requestAnimationFrame(tick);
         observer.disconnect();
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -52,7 +52,7 @@ function Stat({ value, suffix, label }: { value: number; suffix: string; label: 
         {shown}
         {suffix}
       </p>
-      <p className="mt-2 text-sm text-warm/60">{label}</p>
+      <p className="mt-2 text-sm text-ink/60">{label}</p>
     </div>
   );
 }

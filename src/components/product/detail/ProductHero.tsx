@@ -9,6 +9,7 @@ import QuoteButton from "@/components/product/QuoteButton";
 import ProductMediaGallery from "./ProductMediaGallery";
 import { productContainer } from "./product-shell";
 import { t } from "@/lib/i18n";
+import { productImageAlt } from "@/lib/seo";
 
 export default function ProductHero({ product }: { product: PublicProduct }) {
   const images = galleryUrls(product);
@@ -61,7 +62,7 @@ export default function ProductHero({ product }: { product: PublicProduct }) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center border border-ink/18 px-5 py-3 text-[12px] font-semibold tracking-[0.12em] uppercase text-ink transition hover:border-tractor-red hover:text-tractor-red"
               >
-                {t.productDetail.pdfView}
+                {t.productDetail.pdfView} — {product.name}
               </a>
             ) : null}
             {images.length > 1 ? (
@@ -82,8 +83,7 @@ export default function ProductHero({ product }: { product: PublicProduct }) {
             ) : null}
           </div>
         </div>
-
-        <ProductMediaGallery images={images} alt={product.fullTitle} heroImageMode={product.heroImageMode} />
+        <ProductMediaGallery images={images} alt={productImageAlt(product)} heroImageMode={product.heroImageMode} />
       </div>
     </header>
   );

@@ -2,15 +2,12 @@ import type { Metadata } from "next";
 import ContactView from "@/components/pages/ContactView";
 import { getPublishedPage } from "@/lib/pages";
 import { getSiteSettings } from "@/lib/site-settings-data";
+import { PAGE_SEO, publicPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const page = await getPublishedPage("contact");
-  return {
-    title: page.title || "Kontakt",
-    description: page.description,
-  };
+  return publicPageMetadata(PAGE_SEO.contact);
 }
 
 export default async function ContactPage() {

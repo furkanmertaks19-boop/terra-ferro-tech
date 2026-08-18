@@ -8,6 +8,7 @@ import { productHref, publicSubcategoryLabel } from "@/lib/product-path";
 import { coverUrl, type PublicProduct } from "@/lib/types";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
 import QuoteButton from "@/components/product/QuoteButton";
+import { productImageAlt } from "@/lib/seo";
 
 export default function FeaturedEquipmentSection({
   products,
@@ -37,7 +38,7 @@ export default function FeaturedEquipmentSection({
                   <Link href={productHref(product)} className="flex flex-1 flex-col">
                     <div className="relative aspect-[4/3] overflow-hidden bg-[#e8e3d8]">
                       {cover ? (
-                        <Image src={cover} alt={product.fullTitle} fill sizes="30vw" className="object-contain p-5" />
+                        <Image src={cover} alt={productImageAlt(product)} fill sizes="30vw" className="object-contain p-5" />
                       ) : (
                         <div className="flex h-full items-center justify-center text-sm text-ink/35">Imazhi së shpejti</div>
                       )}

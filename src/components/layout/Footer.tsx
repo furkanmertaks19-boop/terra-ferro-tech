@@ -1,24 +1,25 @@
 import Link from "next/link";
 import type { PublicSiteSettings } from "@/lib/site-settings";
-import { NAV_LINKS } from "@/lib/site-content";
+import { publicNavLinks } from "@/lib/site-content";
 import { Logo } from "./Logo";
 import FooterQuoteButton from "./FooterQuoteButton";
 
 export default function Footer({ settings }: { settings: PublicSiteSettings }) {
+  const links = publicNavLinks(settings.usedTractorsEnabled);
   return (
     <footer className="border-t border-warm/10 bg-ink text-warm">
       <div className="container-site grid gap-8 pt-12 pb-6 md:grid-cols-12 md:gap-8 md:pt-16 md:pb-8">
         <div className="md:col-span-4">
           <Logo variant="footer" />
           <p className="mt-4 max-w-xs text-base leading-relaxed text-warm/60">
-            Përfaqësues i traktorëve dhe makinerive bujqësore Armatrac në Shqipëri.
+            Përfaqësues i traktorëve ArmaTrac dhe makinerive bujqësore në Shqipëri.
           </p>
         </div>
 
         <div className="md:col-span-3">
           <p className="text-[13px] font-medium tracking-[0.18em] uppercase text-warm/45">Navigimi</p>
           <ul className="mt-3 space-y-2 text-base text-warm/75">
-            {NAV_LINKS.map((link) => (
+            {links.map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="transition hover:text-tractor-red">
                   {link.label}

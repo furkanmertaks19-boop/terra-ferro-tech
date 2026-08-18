@@ -1,5 +1,6 @@
 import { galleryUrls, type PublicProduct } from "@/lib/types";
 import { t } from "@/lib/i18n";
+import { productImageAlt } from "@/lib/seo";
 import ProductMediaGallery from "./ProductMediaGallery";
 import { productContainer, productEyebrow, productSection, productTitle } from "./product-shell";
 
@@ -15,7 +16,7 @@ export default function ProductGallerySection({ product }: { product: PublicProd
           {t.productDetail.galleryTitle}
         </h2>
         <div className="mt-8">
-          <ProductMediaGallery images={images} alt={product.fullTitle} heroImageMode={product.heroImageMode} layout="section" />
+          <ProductMediaGallery images={images} alt={productImageAlt(product)} heroImageMode={product.heroImageMode} layout="section" />
         </div>
       </div>
     </section>

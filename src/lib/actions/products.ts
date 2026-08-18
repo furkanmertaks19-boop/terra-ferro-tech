@@ -213,6 +213,14 @@ function prismaCore(data: ReturnType<typeof toLiveData>) {
   return core;
 }
 
+async function nextSortOrder(category: Category) {
+  const last = await prisma.product.aggregate({
+    where: { category },
+    _max: { sortOrder: true },
+  });
+  return (last._max.sortOrder ?? -1) + 1;
+}
+
 function toRevision(parsed: ProductSaveInput, pdf: TechnicalPdfWrite): ProductRevision {
   const live = toLiveData(parsed);
   return {
@@ -327,6 +335,7 @@ export async function saveProduct(input: ProductSaveInput): Promise<SaveResult> 
         dealerPrice: 0,
         retailPrice: 0,
         showPriceOnSite: false,
+        sortOrder: await nextSortOrder(data.category),
       },
     });
     await writeTechnicalPdf(row.id, pdf);
@@ -431,6 +440,7 @@ export async function publishProduct(input: ProductSaveInput): Promise<SaveResul
         dealerPrice: 0,
         retailPrice: 0,
         showPriceOnSite: false,
+        sortOrder: await nextSortOrder(data.category),
       },
     });
     await writeTechnicalPdf(row.id, pdf);
@@ -597,6 +607,7 @@ export async function duplicateProduct(id: string) {
       coverImage: product.coverImage,
       images: product.images,
       slug: `${product.slug}-kopya-${Date.now().toString().slice(-4)}`,
+      sortOrder: await nextSortOrder(product.category),
     },
   });
   const extras = await readProductExtras(id);
@@ -661,4 +672,28 @@ export async function bulkDeleteProducts(ids: string[]) {
   revalidatePath("/admin");
   revalidatePath("/traktoret");
   revalidatePath("/makineri-bujqesore");
+}
+
+export async function reorderProducts(category: Category, ids: string[]) {
+  await requireContentAccess();
+  if (ids.length === 0) return;
+  const unique = Array.from(new Set(ids));
+  const owned = await prisma.product.findMany({
+    where: { category, id: { in: unique } },
+    select: { id: true },
+  });
+  if (owned.length !== unique.length) {
+    throw new Error("Sıralama yalnızca aynı kategori içinde yapılabilir.");
+  }
+  const rest = await prisma.product.findMany({
+    where: { category, id: { notIn: unique } },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    select: { id: true },
+  });
+  const ordered = [...unique, ...rest.map((row) => row.id)];
+  await prisma.$transaction(ordered.map((id, sortOrder) => prisma.product.update({ where: { id }, data: { sortOrder } })));
+  revalidatePath("/admin/products");
+  revalidatePath("/traktoret");
+  revalidatePath("/makineri-bujqesore");
+  revalidatePath("/");
 }

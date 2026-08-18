@@ -244,6 +244,12 @@ export default function PageEditor({
                 value={contact.emailLabel}
                 onChange={(e) => update({ ...revision, config: { ...contact, emailLabel: e.target.value } })}
               />
+              <label className="admin-label mt-3">Konu</label>
+              <input
+                className="admin-input"
+                value={contact.subjectLabel}
+                onChange={(e) => update({ ...revision, config: { ...contact, subjectLabel: e.target.value } })}
+              />
               <label className="admin-label mt-3">Mesaj</label>
               <input
                 className="admin-input"

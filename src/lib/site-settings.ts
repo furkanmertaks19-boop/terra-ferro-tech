@@ -10,6 +10,7 @@ export type PublicSiteSettings = {
   mapEmbedUrl: string;
   website: string;
   whatsapp: string;
+  usedTractorsEnabled: boolean;
 };
 
 export const DEFAULT_SITE_SETTINGS: PublicSiteSettings = {
@@ -21,6 +22,7 @@ export const DEFAULT_SITE_SETTINGS: PublicSiteSettings = {
   mapEmbedUrl: DEFAULT_MAP_EMBED_URL,
   website: "www.terraferrotech.com",
   whatsapp: "355752378383",
+  usedTractorsEnabled: false,
 };
 
 export function digitsOnly(value: string) {

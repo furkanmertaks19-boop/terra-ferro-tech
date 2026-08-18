@@ -4,11 +4,13 @@ import { useQuote } from "@/components/quote/QuoteProvider";
 
 export default function QuoteButton({
   productId,
+  usedTractorId,
   productLabel,
   className = "",
   variant = "primary",
 }: {
-  productId: string;
+  productId?: string;
+  usedTractorId?: string;
   productLabel: string;
   className?: string;
   variant?: "primary" | "ghost" | "gold" | "outline";
@@ -24,7 +26,7 @@ export default function QuoteButton({
   return (
     <button
       type="button"
-      onClick={() => openQuote({ productId, productLabel })}
+      onClick={() => openQuote({ productId, usedTractorId, productLabel })}
       className={`inline-flex items-center justify-center px-5 py-3 text-[12px] font-semibold tracking-[0.12em] uppercase transition duration-300 ${styles} ${className}`}
     >
       Kërko Ofertë

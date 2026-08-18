@@ -2,15 +2,12 @@ import type { Metadata } from "next";
 import AboutView from "@/components/pages/AboutView";
 import { getPublishedPage } from "@/lib/pages";
 import { getSiteSettings } from "@/lib/site-settings-data";
+import { PAGE_SEO, publicPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const page = await getPublishedPage("about");
-  return {
-    title: page.title || "Rreth Nesh",
-    description: page.description,
-  };
+  return publicPageMetadata(PAGE_SEO.about);
 }
 
 export default async function AboutPage() {

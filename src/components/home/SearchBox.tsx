@@ -41,6 +41,7 @@ export default function SearchBox() {
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => visibleResults.length > 0 && setOpen(true)}
         placeholder={t.home.searchPlaceholder}
+        aria-label={t.home.searchPlaceholder}
         className="w-full rounded-full border border-white/20 bg-white/10 px-5 py-3.5 text-white placeholder-white/50 backdrop-blur focus:border-brand-gold focus:outline-none"
       />
 

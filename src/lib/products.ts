@@ -27,6 +27,8 @@ export const publicProductSelect = {
   contentBlocks: true,
   heroImageMode: true,
   slug: true,
+  seoTitle: true,
+  seoDescription: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.ProductSelect;
@@ -72,7 +74,7 @@ export function parseListFilters(searchParams: Record<string, string | string[] 
   };
 }
 
-function buildOrderBy(sort: ListFilters["sort"]): Prisma.ProductOrderByWithRelationInput {
+function buildOrderBy(sort: ListFilters["sort"]): Prisma.ProductOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput[] {
   switch (sort) {
     case "name-asc":
       return { name: "asc" };
@@ -81,7 +83,7 @@ function buildOrderBy(sort: ListFilters["sort"]): Prisma.ProductOrderByWithRelat
     case "hp-desc":
       return { horsePower: "desc" };
     default:
-      return { createdAt: "desc" };
+      return [{ sortOrder: "asc" }, { createdAt: "desc" }];
   }
 }
 

@@ -9,7 +9,12 @@
   --surface-2: #22262a;
   --warm: #f3f0e9;
   --warm-white: #f3f0e9;
-  --ivory: #eeeae1;
+  --ivory: #f6f3ec;
+  --warm-white: #f7f5ef;
+  --canvas: #ffffff;
+  --copy: #111315;
+  --copy-2: #626262;
+  --hairline-light: #e8e2d6;
   --soft-grey: #c6c4bd;
   --warm-muted: #c6c4bd;
   --muted: #8c9094;
@@ -75,8 +80,8 @@
   --color-gold-deep: var(--gold-deep);
   --color-line: var(--line);
 
-  --color-background: var(--ink);
-  --color-foreground: var(--warm);
+  --color-background: var(--ivory);
+  --color-foreground: var(--copy);
 
   --font-sans: var(--font-inter);
   --font-display: var(--font-barlow);
@@ -91,13 +96,13 @@
 }
 
 html {
-  background: var(--ink);
+  background: var(--ivory);
   scroll-behavior: smooth;
 }
 
 body {
-  background: var(--ink);
-  color: var(--warm);
+  background: var(--ivory);
+  color: var(--copy);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.55;
@@ -163,8 +168,8 @@ summary {
     position: fixed;
     inset: 0;
     z-index: 80;
-    opacity: 0.025;
-    mix-blend-mode: overlay;
+    opacity: 0.018;
+    mix-blend-mode: multiply;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
@@ -266,4 +271,27 @@ summary {
   .btn-wipe::before {
     transform: none;
   }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only:focus,
+.sr-only:focus-visible {
+  position: fixed;
+  width: auto;
+  height: auto;
+  margin: 0;
+  clip: auto;
+  overflow: visible;
+  white-space: normal;
 }

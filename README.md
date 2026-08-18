@@ -33,4 +33,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/getting-started/deploying) for more details.
+
+## SEO
+
+Public pages use the Next.js App Router metadata API (`src/lib/seo.ts`, `src/app/robots.ts`, `src/app/sitemap.ts`).
+
+- Canonical domain: `https://www.terraferrotech.com`
+- Locale: Albanian (`html lang="sq"`, Open Graph `sq_AL`)
+- Published products are included in `/sitemap.xml`; draft and archived products are not
+- `/admin`, `/api`, login, and preview routes are `noindex`
+
+### Google Search Console
+
+When Google issues a Search Console HTML-tag verification code, put it in `GOOGLE_SITE_VERIFICATION` (see `.env.example`). Do not invent a code.
+
+The metadata field is `verification.google` in `src/app/layout.tsx`.
+
+### Analytics
+
+No GA4 measurement ID is configured. Do not add a tracking ID until one is issued.

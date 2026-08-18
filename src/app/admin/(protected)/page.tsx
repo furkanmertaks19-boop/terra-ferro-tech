@@ -57,32 +57,40 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((card) => {
           const Icon = card.icon;
           return (
-            <Link key={card.label} href={card.href} className="admin-glass rounded-[14px] p-5 transition hover:border-[var(--admin-accent)]">
-              <div className="flex items-start justify-between">
-                <p className="text-xs font-semibold tracking-[0.12em] uppercase text-[var(--admin-muted)]">{card.label}</p>
+            <Link key={card.label} href={card.href} className="admin-panel flex min-h-[148px] flex-col justify-between p-5 transition hover:border-[var(--admin-accent)]">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[var(--admin-muted)]">{card.label}</p>
                 <Icon size={18} className="text-[var(--admin-accent)]" />
               </div>
-              <p className="mt-3 font-display text-4xl font-semibold">{card.value}</p>
-              <p className="mt-1 text-sm text-[var(--admin-text-2)]">{card.hint}</p>
+              <div>
+                <p className="font-display text-[2.4rem] leading-none font-semibold tracking-tight">{card.value}</p>
+                <p className="mt-2 text-sm text-[var(--admin-text-2)]">{card.hint}</p>
+              </div>
             </Link>
           );
         })}
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Link href="/admin/products/new" className="admin-btn admin-btn-primary">+ Yeni Ürün</Link>
-        <Link href="/admin/products/new?category=TRACTOR" className="admin-btn admin-btn-ghost">+ Yeni Traktör</Link>
-        <Link href="/admin/products/new?category=EQUIPMENT" className="admin-btn admin-btn-ghost">+ Yeni Tarım Makinesi</Link>
+        <Link href="/admin/products/new" className="admin-btn admin-btn-primary">
+          + Yeni Ürün
+        </Link>
+        <Link href="/admin/products/new?category=TRACTOR" className="admin-btn admin-btn-ghost">
+          + Yeni Traktör
+        </Link>
+        <Link href="/admin/products/new?category=EQUIPMENT" className="admin-btn admin-btn-ghost">
+          + Yeni Tarım Makinesi
+        </Link>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
         <section className="admin-panel p-5 xl:col-span-1">
           <h2 className="text-sm font-semibold">Ürün dağılımı</h2>
-          <div className="mt-4 h-3 overflow-hidden rounded-full bg-[var(--admin-bg-3)]">
+          <div className="mt-4 h-3 overflow-hidden rounded-full bg-[var(--admin-bg-2)]">
             <div className="h-full bg-[var(--admin-accent)]" style={{ width: `${tractorPct}%` }} />
           </div>
           <p className="mt-3 text-sm text-[var(--admin-text-2)]">
@@ -92,7 +100,7 @@ export default async function AdminDashboard() {
 
         <section className="admin-panel p-5 xl:col-span-2">
           <h2 className="text-sm font-semibold">Eksik içerikler</h2>
-          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             <Gap href="/admin/products?status=DRAFT" label="Taslak ürün" value={drafts} />
             <Gap href="/admin/products" label="Fotoğrafı olmayan" value={noImage} />
             <Gap href="/admin/products" label="Açıklaması olmayan" value={noDesc} />
@@ -106,8 +114,10 @@ export default async function AdminDashboard() {
           <h2 className="text-sm font-semibold">Son eklenen ürünler</h2>
           <ul className="mt-3 divide-y divide-[var(--admin-border)]">
             {recentProducts.map((p) => (
-              <li key={p.id} className="flex items-center justify-between py-2.5 text-sm">
-                <Link href={`/admin/products/${p.id}`} className="hover:text-[var(--admin-accent-2)]">{p.name}</Link>
+              <li key={p.id} className="flex min-h-12 items-center justify-between py-2.5 text-sm">
+                <Link href={`/admin/products/${p.id}`} className="hover:text-[var(--admin-accent-2)]">
+                  {p.name}
+                </Link>
                 <span className="text-[var(--admin-muted)]">{p.category === "TRACTOR" ? "Traktör" : "Makine"}</span>
               </li>
             ))}
@@ -118,9 +128,14 @@ export default async function AdminDashboard() {
           <h2 className="text-sm font-semibold">Son teklif talepleri</h2>
           <ul className="mt-3 divide-y divide-[var(--admin-border)]">
             {recentLeads.map((l) => (
-              <li key={l.id} className="py-2.5 text-sm">
-                <p>{l.name}</p>
-                <p className="text-[var(--admin-muted)]">{l.product?.name ?? "Genel talep"}</p>
+              <li key={l.id} className="flex min-h-12 items-center justify-between gap-3 py-2.5 text-sm">
+                <div>
+                  <p className="font-medium">{l.name}</p>
+                  <p className="text-[var(--admin-muted)]">{l.product?.name ?? "Genel talep"}</p>
+                </div>
+                {!l.readAt ? (
+                  <span className="text-[10px] font-bold tracking-wide text-[var(--admin-danger)] uppercase">Yeni</span>
+                ) : null}
               </li>
             ))}
             {recentLeads.length === 0 && <li className="py-6 text-sm text-[var(--admin-muted)]">Henüz teklif yok.</li>}
@@ -133,9 +148,9 @@ export default async function AdminDashboard() {
 
 function Gap({ href, label, value }: { href: string; label: string; value: number }) {
   return (
-    <Link href={href} className="flex items-center justify-between rounded-[8px] border border-[var(--admin-border)] px-3 py-2 text-sm">
-      <span className="text-[var(--admin-text-2)]">{label}</span>
-      <span className="font-semibold">{value}</span>
+    <Link href={href} className="flex min-h-[72px] items-center justify-between rounded-[8px] border border-[var(--admin-border)] bg-white px-4 py-3">
+      <span className="text-sm text-[var(--admin-text-2)]">{label}</span>
+      <span className="font-display text-2xl font-semibold tabular-nums">{value}</span>
     </Link>
   );
 }

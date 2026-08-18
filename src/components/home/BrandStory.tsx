@@ -22,7 +22,7 @@ export default function BrandStory({ section }: { section?: HomeSectionRecord })
   const ctaHref = section?.ctaHref || "/rreth-nesh";
 
   const photo = (
-    <ImageReveal className="relative aspect-[16/11] overflow-hidden lg:col-span-7" from={imageRight ? "left" : "right"}>
+    <ImageReveal className="relative aspect-[16/11] overflow-hidden bg-[#ece8de] lg:col-span-7" from={imageRight ? "left" : "right"}>
       <ParallaxImage amount={18} className="absolute inset-0">
         <Image src={image} alt={title} fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover scale-[1.08]" />
       </ParallaxImage>
@@ -32,20 +32,20 @@ export default function BrandStory({ section }: { section?: HomeSectionRecord })
   const copy = (
     <Reveal className="lg:col-span-5" y={22}>
       <p className="text-[13px] font-medium tracking-[0.16em] uppercase text-tractor-red">{eyebrow}</p>
-      <TextReveal as="h2" text={title} className="mt-3 font-display text-[clamp(2rem,3.6vw,3.2rem)] font-semibold leading-[1.02] tracking-tight" />
-      <p className="mt-4 text-base leading-relaxed text-warm/70">{body}</p>
+      <TextReveal as="h2" text={title} className="mt-3 font-display text-[clamp(2rem,3.6vw,3.2rem)] font-semibold leading-[1.02] tracking-tight text-ink" />
+      <p className="mt-4 text-base leading-relaxed text-ink/65">{body}</p>
       <Stagger className="mt-6 space-y-4">
         {features.slice(0, 3).map((item) => (
           <StaggerItem key={item.title}>
-            <div className="border-t border-warm/10 pt-4">
-              <p className="text-base font-medium text-warm">{item.title}</p>
-              <p className="mt-1 text-base text-warm/55">{item.body}</p>
+            <div className="border-t border-ink/10 pt-4">
+              <p className="text-base font-medium text-ink">{item.title}</p>
+              <p className="mt-1 text-base text-ink/55">{item.body}</p>
             </div>
           </StaggerItem>
         ))}
       </Stagger>
       <div className="mt-7">
-        <Button href={ctaHref} variant="secondary" arrow>
+        <Button href={ctaHref} variant="dark" arrow>
           {ctaLabel}
         </Button>
       </div>
@@ -53,9 +53,9 @@ export default function BrandStory({ section }: { section?: HomeSectionRecord })
   );
 
   return (
-    <section className="overflow-hidden bg-ink py-[88px] text-warm md:py-[104px]">
+    <section className="overflow-hidden bg-ivory py-[88px] text-ink md:py-[104px]">
       <div className="container-site">
-        <SectionIndex index="06" label="Rreth Nesh" />
+        <SectionIndex index="06" label="Rreth Nesh" tone="light" />
         <div className="mt-6 grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
           {imageRight ? (
             <>

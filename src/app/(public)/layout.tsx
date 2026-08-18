@@ -13,10 +13,12 @@ export default async function PublicLayout({ children }: { children: React.React
 
   return (
     <QuoteProvider contact={settings}>
-      <div className="flex min-h-dvh flex-col overflow-x-hidden bg-ink">
+      <div className="flex min-h-dvh flex-col overflow-x-hidden bg-ivory text-ink">
         <ScrollProgress />
         <Header settings={settings} />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1">
+          {children}
+        </main>
         <Footer settings={settings} />
         <QuoteModal />
         <ShikoCursor />

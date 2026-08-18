@@ -15,11 +15,12 @@ const sq = {
     contact: "Kontakt",
     gallery: "Galeria",
     quote: "Kërko Ofertë",
+    usedTractors: "Traktorë të Përdorur",
   },
   home: {
     heroTitle: "Terra Ferro Tech",
     heroSubtitle:
-      "Traktorë dhe makineri bujqësore Armatrack — fuqi, qëndrueshmëri dhe shërbim i besueshëm në Shqipëri.",
+      "Traktorë dhe makineri bujqësore ArmaTrac — fuqi, qëndrueshmëri dhe shërbim i besueshëm në Shqipëri.",
     searchPlaceholder: "Kërko sipas modelit, serisë ose fuqisë (HP)...",
     searchButton: "Kërko",
     viewTractors: "Shiko Traktorët",
@@ -33,7 +34,7 @@ const sq = {
       "Kultivatorë, çizel, rotovatorë, plugje, spërkatëse dhe pajisje të tjera ndihmëse.",
     aboutTitle: "Rreth Terra Ferro Tech",
     aboutText:
-      "Terra Ferro Tech është përfaqësuesi zyrtar i traktorëve dhe makinerive bujqësore Armatrack në Shqipëri. Ofrojmë cilësi, mbështetje teknike dhe pjesë këmbimi për fermerët dhe bizneset bujqësore në të gjithë vendin.",
+      "Terra Ferro Tech është përfaqësuesi i traktorëve dhe makinerive bujqësore ArmaTrac në Shqipëri. Ofrojmë cilësi, mbështetje teknike dhe pjesë këmbimi për fermerët dhe bizneset bujqësore në të gjithë vendin.",
     featuredTitle: "Modele të Zgjedhura",
   },
   productList: {

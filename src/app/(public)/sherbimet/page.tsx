@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import ServicesView from "@/components/pages/ServicesView";
 import { getPublishedPage } from "@/lib/pages";
+import { PAGE_SEO, publicPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const page = await getPublishedPage("services");
-  return {
-    title: page.title || "Shërbimet",
-    description: page.description,
-  };
+  return publicPageMetadata(PAGE_SEO.services);
 }
 
 export default async function ServicesPage() {

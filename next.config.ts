@@ -43,11 +43,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
-        pathname: "/r2z8qj8o/**",
       },
     ],
+    formats: ["image/avif", "image/webp"],
   },
   experimental: {
+    optimizePackageImports: ["@phosphor-icons/react", "motion"],
     serverActions: {
       bodySizeLimit: "21mb",
     },
@@ -58,12 +59,29 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        source: "/admin/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+      },
+      {
+        source: "/api/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+      },
     ];
   },
   async redirects() {
     return [
       { source: "/traktorler", destination: "/traktoret", permanent: true },
       { source: "/tarim-makineleri", destination: "/makineri-bujqesore", permanent: true },
+      { source: "/about", destination: "/rreth-nesh", permanent: true },
+      { source: "/contact", destination: "/kontakt", permanent: true },
+      { source: "/gallery", destination: "/galeri", permanent: true },
+      { source: "/services", destination: "/sherbimet", permanent: true },
+      { source: "/hakkimizda", destination: "/rreth-nesh", permanent: true },
+      { source: "/iletisim", destination: "/kontakt", permanent: true },
+      { source: "/galeriya", destination: "/galeri", permanent: true },
+      { source: "/login", destination: "/admin/login", permanent: false },
+      { source: "/urunler/:slug", destination: "/produkte/:slug", permanent: true },
       { source: "/admin/quotes", destination: "/admin/leads", permanent: false },
     ];
   },

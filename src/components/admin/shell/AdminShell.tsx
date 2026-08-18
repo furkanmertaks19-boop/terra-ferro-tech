@@ -6,6 +6,7 @@ import { roleLabel } from "@/lib/roles";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import CommandPalette from "./CommandPalette";
+import { AdminNotificationsProvider } from "./AdminNotifications";
 import { ToastProvider } from "../ui/Toast";
 import { ConfirmProvider } from "../ui/ConfirmDialog";
 
@@ -13,11 +14,13 @@ export default function AdminShell({
   userName,
   role,
   email,
+  unreadLeadCount,
   children,
 }: {
   userName: string;
   role: UserRole;
   email: string;
+  unreadLeadCount: number;
   children: React.ReactNode;
 }) {
   void email;
@@ -40,25 +43,27 @@ export default function AdminShell({
     <div className="admin-app">
       <ToastProvider>
         <ConfirmProvider>
-          <div className="flex min-h-dvh">
-            <Sidebar
-              collapsed={collapsed}
-              onToggle={() => setCollapsed((v) => !v)}
-              mobileOpen={mobileOpen}
-              onClose={() => setMobileOpen(false)}
-              role={role}
-            />
-            <div className="flex min-w-0 flex-1 flex-col">
-              <Topbar
-                userName={userName}
-                roleLabel={roleLabel(role)}
-                onMenu={() => setMobileOpen(true)}
-                onSearch={() => setCommand(true)}
+          <AdminNotificationsProvider initialCount={unreadLeadCount}>
+            <div className="flex min-h-dvh">
+              <Sidebar
+                collapsed={collapsed}
+                onToggle={() => setCollapsed((v) => !v)}
+                mobileOpen={mobileOpen}
+                onClose={() => setMobileOpen(false)}
+                role={role}
               />
-              <main className="flex-1 px-4 py-5 lg:px-6 lg:py-6">{children}</main>
+              <div className="flex min-w-0 flex-1 flex-col bg-[var(--admin-bg-2)]">
+                <Topbar
+                  userName={userName}
+                  roleLabel={roleLabel(role)}
+                  onMenu={() => setMobileOpen(true)}
+                  onSearch={() => setCommand(true)}
+                />
+                <main className="flex-1 px-4 py-5 lg:px-6 lg:py-6">{children}</main>
+              </div>
             </div>
-          </div>
-          <CommandPalette open={command} onClose={() => setCommand(false)} role={role} />
+            <CommandPalette open={command} onClose={() => setCommand(false)} role={role} />
+          </AdminNotificationsProvider>
         </ConfirmProvider>
       </ToastProvider>
     </div>

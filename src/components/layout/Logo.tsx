@@ -15,7 +15,7 @@ export function Logo({
         alt="Terra Ferro Tech"
         width={240}
         height={240}
-        priority={variant === "nav"}
+        priority={false}
         className={`w-auto object-contain object-left ${
           variant === "footer" ? "h-11 md:h-12" : "h-11 md:h-14"
         }`}

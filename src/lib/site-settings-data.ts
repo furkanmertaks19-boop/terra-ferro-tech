@@ -16,6 +16,7 @@ function mapSettings(row: {
   mapEmbedUrl: string;
   website: string;
   whatsapp: string;
+  usedTractorsEnabled?: boolean;
 }): PublicSiteSettings {
   return {
     companyName: row.companyName,
@@ -26,6 +27,7 @@ function mapSettings(row: {
     mapEmbedUrl: extractMapEmbedUrl(row.mapEmbedUrl) || DEFAULT_MAP_EMBED_URL,
     website: row.website,
     whatsapp: row.whatsapp || toWhatsapp(row.phoneHref || row.phone),
+    usedTractorsEnabled: Boolean(row.usedTractorsEnabled),
   };
 }
 

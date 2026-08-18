@@ -12,7 +12,7 @@ export default function CatalogHero({ page }: { page: PublicCategoryPage }) {
       {desktop ? (
         <Image
           src={desktop}
-          alt=""
+          alt={page.title || ""}
           fill
           priority
           sizes="100vw"
@@ -20,7 +20,7 @@ export default function CatalogHero({ page }: { page: PublicCategoryPage }) {
         />
       ) : null}
       {mobile ? (
-        <Image src={mobile} alt="" fill priority sizes="100vw" className="object-cover object-center md:hidden" />
+        <Image src={mobile} alt={page.title || ""} fill priority sizes="100vw" className="object-cover object-center md:hidden" />
       ) : null}
       <div
         className={`absolute inset-0 ${

@@ -30,14 +30,15 @@ export default function ProductPdfCard({ product }: { product: PublicProduct }) 
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center bg-tractor-red px-5 py-3 text-[12px] font-semibold tracking-[0.12em] uppercase text-white transition hover:bg-tractor-red-dark"
             >
-              {t.productDetail.pdfView}
+              {t.productDetail.pdfView} — {product.name}
             </a>
             <a
               href={href}
               download
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center border border-ink/18 px-5 py-3 text-[12px] font-semibold tracking-[0.12em] uppercase text-ink transition hover:border-tractor-red hover:text-tractor-red"
             >
-              {t.productDetail.pdfDownload}
+              {t.productDetail.pdfDownload} — {product.name}
             </a>
           </div>
         </div>

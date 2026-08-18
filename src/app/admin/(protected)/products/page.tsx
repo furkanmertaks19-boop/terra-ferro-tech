@@ -1,7 +1,13 @@
 import { prisma } from "@/lib/prisma";
-import { Category, Prisma, ProductStatus } from "@prisma/client";
+import { Category, ProductStatus } from "@prisma/client";
 import { toAdminProduct } from "@/lib/types";
 import ProductsWorkspace from "@/components/admin/products/ProductsWorkspace";
+import {
+  adminProductOrderBy,
+  adminProductWhere,
+  parseAdminProductQuery,
+  tabCategory,
+} from "@/lib/admin-products-query";
 
 export const dynamic = "force-dynamic";
 
@@ -12,53 +18,60 @@ export default async function AdminProductsPage({
 }) {
   const params = await searchParams;
   const get = (k: string) => (Array.isArray(params[k]) ? params[k]?.[0] : params[k]);
-  const q = get("q");
-  const category = get("category");
-  const status = get("status");
-  const template = get("template");
-  const featured = get("featured");
-  const series = get("series");
-  const subcategory = get("subcategory");
+  const query = parseAdminProductQuery(get);
+  const where = adminProductWhere(query);
+  const category = tabCategory(query.type);
+  const optionWhere = category ? { category } : query.type === "archive" ? { status: ProductStatus.ARCHIVED } : { status: { not: ProductStatus.ARCHIVED } };
 
-  const where: Prisma.ProductWhereInput = {};
-  if (category === Category.TRACTOR || category === Category.EQUIPMENT) where.category = category;
-  if (status === ProductStatus.DRAFT || status === ProductStatus.PUBLISHED || status === ProductStatus.ARCHIVED) {
-    where.status = status;
-  } else {
-    where.status = { not: ProductStatus.ARCHIVED };
-  }
-  if (template) where.template = template;
-  if (series) where.series = series;
-  if (subcategory) where.subcategory = subcategory;
-  if (featured === "1") where.featured = true;
-  if (q) {
-    where.OR = [
-      { name: { contains: q, mode: "insensitive" } },
-      { fullTitle: { contains: q, mode: "insensitive" } },
-      { series: { contains: q, mode: "insensitive" } },
-    ];
-  }
-
-  const [products, seriesRows, subRows] = await Promise.all([
-    prisma.product.findMany({ where, orderBy: { updatedAt: "desc" } }),
-    prisma.product.findMany({ distinct: ["series"], select: { series: true }, orderBy: { series: "asc" } }),
-    prisma.product.findMany({ distinct: ["subcategory"], select: { subcategory: true } }),
+  const [products, grouped, seriesRows, subRows, stageRows] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      orderBy: adminProductOrderBy(query),
+    }),
+    prisma.product.groupBy({
+      by: ["category", "status"],
+      _count: { _all: true },
+    }),
+    prisma.product.findMany({
+      where: optionWhere,
+      distinct: ["series"],
+      select: { series: true },
+      orderBy: { series: "asc" },
+    }),
+    prisma.product.findMany({
+      where: optionWhere,
+      distinct: ["subcategory"],
+      select: { subcategory: true },
+      orderBy: { subcategory: "asc" },
+    }),
+    prisma.product.findMany({
+      where: { category: Category.TRACTOR, stage: { not: null } },
+      distinct: ["stage"],
+      select: { stage: true },
+      orderBy: { stage: "asc" },
+    }),
   ]);
+
+  const counts = { all: 0, tractor: 0, equipment: 0, draft: 0, archive: 0 };
+  for (const row of grouped) {
+    const n = row._count._all;
+    if (row.status === ProductStatus.ARCHIVED) counts.archive += n;
+    else {
+      counts.all += n;
+      if (row.category === Category.TRACTOR) counts.tractor += n;
+      if (row.category === Category.EQUIPMENT) counts.equipment += n;
+    }
+    if (row.status === ProductStatus.DRAFT) counts.draft += n;
+  }
 
   return (
     <ProductsWorkspace
       products={products.map(toAdminProduct)}
-      query={{
-        q: q ?? "",
-        category: category ?? "",
-        status: status ?? "",
-        template: template ?? "",
-        featured: featured ?? "",
-        series: series ?? "",
-        subcategory: subcategory ?? "",
-      }}
-      seriesOptions={seriesRows.map((r) => r.series)}
-      subcategoryOptions={subRows.map((r) => r.subcategory).filter((v): v is string => Boolean(v))}
+      query={query}
+      counts={counts}
+      seriesOptions={seriesRows.map((row) => row.series).filter(Boolean)}
+      subcategoryOptions={subRows.map((row) => row.subcategory).filter((value): value is string => Boolean(value))}
+      stageOptions={stageRows.map((row) => row.stage).filter((value): value is string => Boolean(value))}
     />
   );
 }

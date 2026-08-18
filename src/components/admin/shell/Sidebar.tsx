@@ -19,7 +19,9 @@ import {
   Images,
   Users,
   ShieldCheck,
+  Truck,
 } from "@phosphor-icons/react";
+import { UnreadLeadBadge } from "./AdminNotifications";
 
 const NAV = [
   {
@@ -30,6 +32,7 @@ const NAV = [
     section: "Ürün Yönetimi",
     items: [
       { href: "/admin/products", label: "Ürünler", icon: Package },
+      { href: "/admin/used-tractors", label: "2. El Traktörler", icon: Truck },
       { href: "/admin/categories", label: "Kategoriler", icon: TreeStructure },
       { href: "/admin/leads", label: "Teklif Talepleri", icon: ChatCircleDots },
     ],
@@ -102,14 +105,15 @@ export default function Sidebar({
                       href={item.href}
                       title={collapsed ? item.label : undefined}
                       onClick={onClose}
-                      className={`flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm transition ${
+                      className={`relative flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm transition ${
                         active
                           ? "bg-[rgb(216_169_54/0.16)] text-[var(--admin-accent-2)]"
                           : "text-[var(--admin-text-2)] hover:bg-[var(--admin-surface-2)] hover:text-[var(--admin-text)]"
                       } ${collapsed ? "justify-center px-2" : ""}`}
                     >
                       <Icon size={18} />
-                      {!collapsed && item.label}
+                      {!collapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
+                      {item.href === "/admin/leads" ? <UnreadLeadBadge collapsed={collapsed} /> : null}
                     </Link>
                   </li>
                 );
@@ -133,7 +137,7 @@ export default function Sidebar({
   return (
     <>
       <aside
-        className={`admin-glass sticky top-0 hidden h-dvh shrink-0 lg:block ${collapsed ? "w-[76px]" : "w-[272px]"}`}
+        className={`sticky top-0 hidden h-dvh shrink-0 border-r border-[var(--admin-border)] bg-white lg:block ${collapsed ? "w-[76px]" : "w-[272px]"}`}
         style={{ transition: "width 220ms cubic-bezier(0.16,1,0.3,1)" }}
       >
         {body}
@@ -142,7 +146,7 @@ export default function Sidebar({
       {mobileOpen && (
         <div className="fixed inset-0 z-[70] lg:hidden">
           <button type="button" className="absolute inset-0 bg-black/55" aria-label="Menüyü kapat" onClick={onClose} />
-          <aside className="admin-glass relative h-full w-[272px]">{body}</aside>
+          <aside className="relative h-full w-[272px] border-r border-[var(--admin-border)] bg-white">{body}</aside>
         </div>
       )}
     </>

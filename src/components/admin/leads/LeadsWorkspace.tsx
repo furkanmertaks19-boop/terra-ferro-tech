@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LeadStatus } from "@prisma/client";
-import { updateLeadStatus } from "@/lib/actions/leads";
+import { markLeadReadAction, updateLeadStatus, deleteLead } from "@/lib/actions/leads";
+import { relativeTimeTr } from "@/lib/relative-time";
 import { useToast } from "../ui/Toast";
+import { useConfirm } from "../ui/ConfirmDialog";
+import { useAdminNotifications } from "../shell/AdminNotifications";
 
 export type LeadRow = {
   id: string;
@@ -13,8 +17,10 @@ export type LeadRow = {
   email: string | null;
   message: string | null;
   status: LeadStatus;
+  readAt: string | null;
   createdAt: string;
   product: { name: string; slug: string; category: "TRACTOR" | "EQUIPMENT" } | null;
+  usedTractor: { id: string; brand: string; model: string; slug: string } | null;
 };
 
 const STATUS: { value: LeadStatus; label: string }[] = [
@@ -24,10 +30,89 @@ const STATUS: { value: LeadStatus; label: string }[] = [
   { value: "COMPLETED", label: "Tamamlandı" },
 ];
 
-export default function LeadsWorkspace({ leads }: { leads: LeadRow[] }) {
+function leadSubject(lead: LeadRow) {
+  if (lead.usedTractor) return `${lead.usedTractor.brand} ${lead.usedTractor.model} · 2. el`;
+  return lead.product?.name ?? "Genel iletişim";
+}
+
+function summary(message: string | null) {
+  if (!message) return "—";
+  const text = message.replace(/\s+/g, " ").trim();
+  return text.length > 72 ? `${text.slice(0, 72)}…` : text;
+}
+
+export default function LeadsWorkspace({
+  leads,
+  initialOpenId,
+  canDelete,
+}: {
+  leads: LeadRow[];
+  initialOpenId?: string | null;
+  canDelete: boolean;
+}) {
   const { push } = useToast();
-  const [open, setOpen] = useState<LeadRow | null>(null);
+  const confirm = useConfirm();
+  const { refresh } = useAdminNotifications();
+  const router = useRouter();
+  const [openId, setOpenId] = useState<string | null>(initialOpenId ?? null);
+  const [statusOverride, setStatusOverride] = useState<LeadStatus | null>(null);
   const [pending, start] = useTransition();
+  const selected = openId ? (leads.find((item) => item.id === openId) ?? null) : null;
+  const open = selected ? { ...selected, status: statusOverride ?? selected.status } : null;
+
+  useEffect(() => {
+    if (!openId) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpenId(null);
+        setStatusOverride(null);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openId]);
+
+  useEffect(() => {
+    if (!openId) return;
+    const lead = leads.find((item) => item.id === openId);
+    if (!lead || lead.readAt) return;
+    let cancelled = false;
+    void markLeadReadAction(openId).then(() => {
+      if (cancelled) return;
+      void refresh();
+      router.refresh();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [openId, leads, refresh, router]);
+
+  function openLead(lead: LeadRow) {
+    setOpenId(lead.id);
+    setStatusOverride(null);
+  }
+
+  function closeLead() {
+    setOpenId(null);
+    setStatusOverride(null);
+  }
+
+  async function removeLead(lead: LeadRow) {
+    const ok = await confirm({
+      title: "Teklif talebini sil",
+      body: "Bu teklif talebini silmek istediğinize emin misiniz?",
+      confirmLabel: "Sil",
+      danger: true,
+    });
+    if (!ok) return;
+    start(async () => {
+      await deleteLead(lead.id);
+      if (openId === lead.id) closeLead();
+      await refresh();
+      router.refresh();
+      push("Teklif talebi silindi");
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -47,19 +132,54 @@ export default function LeadsWorkspace({ leads }: { leads: LeadRow[] }) {
                   <th className="px-4 py-3">Telefon</th>
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Ürün</th>
+                  <th className="px-4 py-3">Mesaj</th>
                   <th className="px-4 py-3">Tarih</th>
                   <th className="px-4 py-3">Durum</th>
+                  {canDelete ? <th className="px-4 py-3 text-right">İşlem</th> : null}
                 </tr>
               </thead>
               <tbody>
                 {leads.map((lead) => (
-                  <tr key={lead.id} className="cursor-pointer border-t border-[var(--admin-border)] hover:bg-[var(--admin-surface-2)]" onClick={() => setOpen(lead)}>
-                    <td className="px-4 py-3 font-medium">{lead.name}</td>
+                  <tr
+                    key={lead.id}
+                    className={`cursor-pointer border-t border-[var(--admin-border)] hover:bg-[var(--admin-surface-2)] ${
+                      lead.readAt ? "" : "bg-[rgb(180_35_24/0.04)]"
+                    }`}
+                    onClick={() => openLead(lead)}
+                  >
+                    <td className="px-4 py-3 font-medium">
+                      <span className="flex items-center gap-2">
+                        {!lead.readAt ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--admin-danger)]/10 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[var(--admin-danger)] uppercase">
+                            <span aria-hidden>●</span> Yeni
+                          </span>
+                        ) : null}
+                        {lead.name}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-[var(--admin-text-2)]">{lead.phone}</td>
                     <td className="px-4 py-3 text-[var(--admin-text-2)]">{lead.email ?? "—"}</td>
-                    <td className="px-4 py-3 text-[var(--admin-text-2)]">{lead.product?.name ?? "—"}</td>
+                    <td className="px-4 py-3 text-[var(--admin-text-2)]">{leadSubject(lead)}</td>
+                    <td className="max-w-[220px] truncate px-4 py-3 text-[var(--admin-text-2)]">{summary(lead.message)}</td>
                     <td className="px-4 py-3 text-[var(--admin-muted)]">{new Date(lead.createdAt).toLocaleDateString("tr-TR")}</td>
-                    <td className="px-4 py-3"><Status status={lead.status} /></td>
+                    <td className="px-4 py-3">
+                      <Status status={lead.status} />
+                    </td>
+                    {canDelete ? (
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn-danger min-h-9 px-3"
+                          disabled={pending}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            void removeLead(lead);
+                          }}
+                        >
+                          Sil
+                        </button>
+                      </td>
+                    ) : null}
                   </tr>
                 ))}
               </tbody>
@@ -67,10 +187,32 @@ export default function LeadsWorkspace({ leads }: { leads: LeadRow[] }) {
           </div>
           <div className="space-y-2 md:hidden">
             {leads.map((lead) => (
-              <button key={lead.id} type="button" className="admin-panel w-full p-3 text-left" onClick={() => setOpen(lead)}>
-                <p className="font-medium">{lead.name}</p>
-                <p className="text-xs text-[var(--admin-muted)]">{lead.product?.name ?? "Genel"} · {new Date(lead.createdAt).toLocaleDateString("tr-TR")}</p>
-              </button>
+              <div key={lead.id} className="admin-panel flex items-start gap-3 p-3">
+                <button type="button" className="min-w-0 flex-1 text-left" onClick={() => openLead(lead)}>
+                  <p className="flex items-center gap-2 font-medium">
+                    {!lead.readAt ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide text-[var(--admin-danger)] uppercase">
+                        <span aria-hidden>●</span> Yeni
+                      </span>
+                    ) : null}
+                    {lead.name}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--admin-muted)]">
+                    {leadSubject(lead)} · {new Date(lead.createdAt).toLocaleDateString("tr-TR")}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-sm text-[var(--admin-text-2)]">{summary(lead.message)}</p>
+                </button>
+                {canDelete ? (
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-danger shrink-0 min-h-9 px-3"
+                    disabled={pending}
+                    onClick={() => void removeLead(lead)}
+                  >
+                    Sil
+                  </button>
+                ) : null}
+              </div>
             ))}
           </div>
         </>
@@ -78,27 +220,49 @@ export default function LeadsWorkspace({ leads }: { leads: LeadRow[] }) {
 
       {open && (
         <div className="fixed inset-0 z-[75]">
-          <button type="button" className="absolute inset-0 bg-black/55" aria-label="Kapat" onClick={() => setOpen(null)} />
-          <aside className="admin-glass absolute inset-y-0 right-0 w-[min(100vw,420px)] overflow-y-auto p-5" role="dialog" aria-modal="true">
+          <button type="button" className="absolute inset-0 bg-black/40" aria-label="Kapat" onClick={closeLead} />
+          <aside className="absolute inset-y-0 right-0 w-[min(100vw,420px)] overflow-y-auto border-l border-[var(--admin-border)] bg-white p-5" role="dialog" aria-modal="true">
             <p className="text-xs uppercase tracking-wide text-[var(--admin-muted)]">Teklif detayı</p>
             <h2 className="mt-1 font-display text-2xl">{open.name}</h2>
+            <p className="mt-1 text-xs text-[var(--admin-muted)]">{relativeTimeTr(open.createdAt)}</p>
             <dl className="mt-4 space-y-3 text-sm">
               <div>
                 <dt className="text-[var(--admin-muted)]">Telefon</dt>
-                <dd><a href={`tel:${open.phone}`} className="text-[var(--admin-accent-2)]">{open.phone}</a></dd>
+                <dd>
+                  <a href={`tel:${open.phone}`} className="text-[var(--admin-accent-2)]">
+                    {open.phone}
+                  </a>
+                </dd>
               </div>
               <div>
                 <dt className="text-[var(--admin-muted)]">Email</dt>
-                <dd>{open.email ? <a href={`mailto:${open.email}`} className="text-[var(--admin-accent-2)]">{open.email}</a> : "—"}</dd>
+                <dd>
+                  {open.email ? (
+                    <a href={`mailto:${open.email}`} className="text-[var(--admin-accent-2)]">
+                      {open.email}
+                    </a>
+                  ) : (
+                    "—"
+                  )}
+                </dd>
               </div>
               <div>
                 <dt className="text-[var(--admin-muted)]">Ürün</dt>
                 <dd>
-                  {open.product ? (
-                    <Link href={open.product.category === "TRACTOR" ? `/traktoret/${open.product.slug}` : `/makineri-bujqesore/${open.product.slug}`} className="text-[var(--admin-accent-2)]">
+                  {open.usedTractor ? (
+                    <Link href={`/admin/used-tractors/${open.usedTractor.id}`} className="text-[var(--admin-accent-2)]">
+                      {open.usedTractor.brand} {open.usedTractor.model} · 2. el
+                    </Link>
+                  ) : open.product ? (
+                    <Link
+                      href={open.product.category === "TRACTOR" ? `/traktoret/${open.product.slug}` : `/makineri-bujqesore/${open.product.slug}`}
+                      className="text-[var(--admin-accent-2)]"
+                    >
                       {open.product.name}
                     </Link>
-                  ) : "—"}
+                  ) : (
+                    "Genel iletişim"
+                  )}
                 </dd>
               </div>
               <div>
@@ -119,16 +283,20 @@ export default function LeadsWorkspace({ leads }: { leads: LeadRow[] }) {
                 const status = e.target.value as LeadStatus;
                 start(async () => {
                   await updateLeadStatus(open.id, status);
-                  setOpen({ ...open, status });
+                  setStatusOverride(status);
                   push("Durum güncellendi");
                 });
               }}
             >
               {STATUS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
               ))}
             </select>
-            <button type="button" className="admin-btn admin-btn-ghost mt-5 w-full" onClick={() => setOpen(null)}>Kapat</button>
+            <button type="button" className="admin-btn admin-btn-ghost mt-5 w-full" onClick={closeLead}>
+              Kapat
+            </button>
           </aside>
         </div>
       )}

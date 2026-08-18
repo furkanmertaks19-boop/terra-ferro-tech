@@ -34,6 +34,7 @@ export type PublicProduct = Omit<
   | "hasUnpublishedChanges"
   | "referenceUrl"
   | "specGroups"
+  | "sortOrder"
 > & {
   specs: Record<string, string>;
   specGroups?: SpecGroup[] | null;

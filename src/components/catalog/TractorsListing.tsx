@@ -27,6 +27,7 @@ export default function TractorsListing({
         </Suspense>
 
         <div className="min-w-0 flex-1">
+          <h2 className="sr-only">Modelet e traktorëve</h2>
           <div className="mb-6">
             <div className="mb-4 flex items-center justify-between gap-4">
               <p className="text-base text-ink/55">

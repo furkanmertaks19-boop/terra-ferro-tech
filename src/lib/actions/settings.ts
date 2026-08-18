@@ -53,6 +53,7 @@ export async function saveSiteSettings(input: z.infer<typeof settingsSchema>): P
       mapEmbedUrl: mapEmbedUrl || DEFAULT_MAP_EMBED_URL,
       website,
       whatsapp: toWhatsapp(phoneHref),
+      usedTractorsEnabled: false,
     },
     update: {
       companyName: parsed.data.companyName.trim(),
@@ -71,5 +72,38 @@ export async function saveSiteSettings(input: z.infer<typeof settingsSchema>): P
   revalidatePath("/kontakt");
   revalidatePath("/rreth-nesh");
   revalidatePath("/admin/settings");
+  return { ok: true };
+}
+
+export async function setUsedTractorsEnabled(enabled: boolean): Promise<SettingsSaveResult> {
+  await requireAdmin();
+  const current = await prisma.siteSettings.findUnique({ where: { id: "default" } });
+  if (!current) {
+    await prisma.siteSettings.create({
+      data: {
+        id: "default",
+        companyName: "Terra Ferro Tech",
+        email: "terraferrotech@gmail.com",
+        phone: "+355 75 237 83 83",
+        phoneHref: "+355752378383",
+        location: "Lushnje, Albania",
+        mapEmbedUrl: DEFAULT_MAP_EMBED_URL,
+        website: "www.terraferrotech.com",
+        whatsapp: "355752378383",
+        usedTractorsEnabled: enabled,
+      },
+    });
+  } else {
+    await prisma.siteSettings.update({
+      where: { id: "default" },
+      data: { usedTractorsEnabled: enabled },
+    });
+  }
+
+  revalidatePath("/", "layout");
+  revalidatePath("/");
+  revalidatePath("/traktore-te-perdorur");
+  revalidatePath("/admin/used-tractors");
+  revalidatePath("/sitemap.xml");
   return { ok: true };
 }

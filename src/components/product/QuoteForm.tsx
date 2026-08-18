@@ -9,9 +9,11 @@ const initialState: LeadFormState = { success: false };
 
 export default function QuoteForm({
   productId,
+  usedTractorId,
   productLabel,
 }: {
   productId?: string;
+  usedTractorId?: string;
   productLabel?: string;
 }) {
   const [state, formAction, pending] = useActionState(createLead, initialState);
@@ -36,16 +38,18 @@ export default function QuoteForm({
 
       <form action={formAction} className="relative mt-4 space-y-3">
         {productId && <input type="hidden" name="productId" value={productId} />}
+        {usedTractorId && <input type="hidden" name="usedTractorId" value={usedTractorId} />}
         <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden>
           <label htmlFor="company_website">Website</label>
           <input id="company_website" name="company_website" tabIndex={-1} autoComplete="off" />
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-black/70">
+          <label htmlFor="quote-name" className="mb-1 block text-xs font-medium text-black/70">
             {t.quoteForm.name}
           </label>
           <input
+            id="quote-name"
             name="name"
             required
             minLength={2}
@@ -54,10 +58,11 @@ export default function QuoteForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-black/70">
+          <label htmlFor="quote-phone" className="mb-1 block text-xs font-medium text-black/70">
             {t.quoteForm.phone}
           </label>
           <input
+            id="quote-phone"
             name="phone"
             type="tel"
             required
@@ -67,10 +72,11 @@ export default function QuoteForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-black/70">
+          <label htmlFor="quote-email" className="mb-1 block text-xs font-medium text-black/70">
             {t.quoteForm.email}
           </label>
           <input
+            id="quote-email"
             name="email"
             type="email"
             className="w-full rounded border border-black/15 px-3 py-2 text-sm focus:border-brand-red focus:outline-none"
@@ -78,10 +84,11 @@ export default function QuoteForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-black/70">
+          <label htmlFor="quote-message" className="mb-1 block text-xs font-medium text-black/70">
             {t.quoteForm.message}
           </label>
           <textarea
+            id="quote-message"
             name="message"
             rows={3}
             className="w-full rounded border border-black/15 px-3 py-2 text-sm focus:border-brand-red focus:outline-none"

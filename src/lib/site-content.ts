@@ -8,6 +8,21 @@ export const NAV_LINKS = [
   { href: "/kontakt", label: "Kontakt" },
 ] as const;
 
+export const USED_TRACTORS_NAV = {
+  href: "/traktore-te-perdorur",
+  label: "Traktorë të Përdorur",
+} as const;
+
+export type PublicNavLink = { href: string; label: string };
+
+export function publicNavLinks(usedTractorsEnabled: boolean): PublicNavLink[] {
+  if (!usedTractorsEnabled) return [...NAV_LINKS];
+  const links: PublicNavLink[] = [...NAV_LINKS];
+  const index = links.findIndex((link) => link.href === "/traktoret");
+  links.splice(index + 1, 0, USED_TRACTORS_NAV);
+  return links;
+}
+
 export const SERVICES = [
   {
     title: "Konsulencë për zgjedhjen e traktorit",
@@ -15,7 +30,7 @@ export const SERVICES = [
   },
   {
     title: "Shitje",
-    body: "Gama Armatrac e traktorëve dhe makinerive bujqësore, me këshillim të drejtpërdrejtë nga ekipi ynë.",
+    body: "Gama ArmaTrac e traktorëve dhe makinerive bujqësore, me këshillim të drejtpërdrejtë nga ekipi ynë.",
   },
   {
     title: "Pjesë këmbimi",
@@ -38,7 +53,7 @@ export const TRUST_STATS = {
 
 export const ABOUT = {
   headline: "Partneri juaj në mekanizimin bujqësor.",
-  body: "Terra Ferro Tech është përfaqësues i traktorëve dhe makinerive bujqësore Armatrac në Shqipëri. Ofrojmë shitje, këshillim teknik dhe pjesë këmbimi për fermerët dhe bizneset bujqësore.",
+  body: "Terra Ferro Tech është përfaqësues i traktorëve dhe makinerive bujqësore ArmaTrac në Shqipëri. Ofrojmë shitje, këshillim teknik dhe pjesë këmbimi për fermerët dhe bizneset bujqësore.",
   values: [
     {
       title: "Shitje e drejtpërdrejtë",

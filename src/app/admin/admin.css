@@ -1,15 +1,15 @@
 .admin-app {
-  --admin-bg: #f3eee4;
-  --admin-bg-2: #ebe4d6;
+  --admin-bg: #fafafa;
+  --admin-bg-2: #f8f9fa;
   --admin-bg-3: #ffffff;
   --admin-surface: #ffffff;
-  --admin-surface-2: #f8f4ec;
-  --admin-glass: rgba(255, 255, 255, 0.86);
-  --admin-border: rgba(20, 23, 28, 0.12);
-  --admin-border-strong: rgba(20, 23, 28, 0.2);
+  --admin-surface-2: #f8f9fa;
+  --admin-glass: #ffffff;
+  --admin-border: #e8e8e8;
+  --admin-border-strong: #dcdcdc;
   --admin-text: #14171c;
   --admin-text-2: #4d5561;
-  --admin-muted: #66707e;
+  --admin-muted: #6b7280;
   --admin-accent: #c4962c;
   --admin-accent-2: #a67b1d;
   --admin-accent-ink: #1a1404;
@@ -17,19 +17,17 @@
   --admin-warning: #b7791f;
   --admin-danger: #b42318;
   --admin-info: #2f6fbd;
-  --admin-shadow: 0 16px 40px rgb(20 23 28 / 0.08);
+  --admin-shadow: 0 1px 2px rgb(17 19 21 / 0.04), 0 8px 24px rgb(17 19 21 / 0.04);
   --admin-radius-sm: 6px;
   --admin-radius: 10px;
-  --admin-radius-lg: 14px;
+  --admin-radius-lg: 12px;
   --admin-focus: 0 0 0 3px rgb(196 150 44 / 0.28);
   --radius-sm: var(--admin-radius-sm);
   --radius-md: var(--admin-radius);
   --radius-lg: var(--admin-radius-lg);
   --shadow-glass: var(--admin-shadow);
   color: var(--admin-text);
-  background:
-    radial-gradient(1000px 420px at 8% -12%, rgb(216 169 54 / 0.14), transparent 48%),
-    var(--admin-bg);
+  background: var(--admin-bg);
   min-height: 100dvh;
   font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
@@ -50,9 +48,7 @@
 }
 
 .admin-glass {
-  background: var(--admin-glass);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: var(--admin-surface);
   border: 1px solid var(--admin-border);
 }
 
@@ -60,6 +56,7 @@
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow);
 }
 
 .admin-input,
@@ -190,6 +187,7 @@
 
 .admin-app main {
   max-width: 1440px;
+  background: var(--admin-bg-2);
 }
 
 @media (prefers-reduced-motion: reduce) {

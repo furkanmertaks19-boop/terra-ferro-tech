@@ -24,9 +24,9 @@ export default function ServicesSection({ section }: { section?: HomeSectionReco
   const eyebrow = section?.eyebrow || "Shërbimet";
 
   return (
-    <section id="sherbimet" className="section-pad bg-graphite text-warm">
+    <section id="sherbimet" className="section-pad bg-white text-ink">
       <div className="container-site">
-        <SectionIndex index="05" label={eyebrow} />
+        <SectionIndex index="05" label={eyebrow} tone="light" />
         <div className="mt-6 grid items-stretch gap-8 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-7">
             <h2 className="font-display text-[clamp(2.2rem,4vw,3.4rem)] font-semibold tracking-tight">
@@ -39,10 +39,10 @@ export default function ServicesSection({ section }: { section?: HomeSectionReco
                   type="button"
                   onMouseEnter={() => setActive(i)}
                   onFocus={() => setActive(i)}
-                  className={`flex w-full items-start gap-4 border-b border-warm/10 border-l-2 py-4 pl-3 text-left transition-colors md:py-5 ${
+                  className={`flex w-full items-start gap-4 border-b border-ink/10 border-l-2 py-4 pl-3 text-left transition-colors md:py-5 ${
                     i === active
-                      ? "border-l-tractor-red text-warm"
-                      : "border-l-transparent text-warm/45 hover:border-l-tractor-red/50 hover:text-warm"
+                      ? "border-l-tractor-red text-ink"
+                      : "border-l-transparent text-ink/45 hover:border-l-tractor-red/50 hover:text-ink"
                   }`}
                 >
                   <span className="font-display text-sm tabular-nums text-tractor-red md:text-base">
@@ -53,7 +53,7 @@ export default function ServicesSection({ section }: { section?: HomeSectionReco
                       {service.title}
                     </span>
                     {i === active && (
-                      <span className="mt-2 block max-w-[52ch] text-base leading-relaxed text-warm/60">
+                      <span className="mt-2 block max-w-[52ch] text-base leading-relaxed text-ink/60">
                         {service.body}
                       </span>
                     )}
@@ -63,7 +63,7 @@ export default function ServicesSection({ section }: { section?: HomeSectionReco
             </div>
           </div>
 
-          <div className="relative hidden aspect-[4/5] overflow-hidden bg-steel lg:col-span-5 lg:block">
+          <div className="relative hidden aspect-[4/5] overflow-hidden bg-[#ece8de] lg:col-span-5 lg:block">
             <AnimatePresence mode="wait">
               <motion.div
                 key={image}
