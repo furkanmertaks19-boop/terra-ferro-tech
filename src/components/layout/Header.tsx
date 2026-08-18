@@ -46,12 +46,12 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
       </a>
       <header className="fixed inset-x-0 top-0 z-[50]">
         <div
-          className={`border-b transition-[background-color,box-shadow,border-color] duration-300 ease-out-expo ${
+          className={`transition-[background-color,box-shadow,border-color,backdrop-filter] duration-[220ms] ease-out ${
             open
-              ? "border-ink/8 bg-ivory"
+              ? "border-b border-ink/8 bg-ivory"
               : scrolled
-                ? "border-ink/10 bg-white/92 shadow-[0_10px_30px_rgb(17_19_21_/_0.06)] backdrop-blur-md"
-                : "border-ink/8 bg-white/80 backdrop-blur-sm"
+                ? "border-b border-ink/10 bg-white/92 shadow-[0_4px_24px_rgb(17_19_21_/_0.07)] backdrop-blur-md"
+                : "border-b border-transparent bg-transparent"
           }`}
         >
           <div className="mx-auto flex min-h-[72px] max-w-[1480px] items-center justify-between gap-6 px-5 md:min-h-[78px] md:px-8">
@@ -72,8 +72,12 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
                       key={link.href}
                       href={link.href}
                       data-active={active}
-                      className={`nav-link px-2 py-2 text-[12px] font-medium tracking-[0.02em] whitespace-nowrap transition-colors duration-[180ms] xl:px-3 ${
-                        active ? "text-tractor-red" : "text-ink/70 hover:text-ink"
+                      className={`nav-link px-2 py-2 text-[12px] font-medium tracking-[0.02em] whitespace-nowrap transition-colors duration-[220ms] xl:px-3 ${
+                        active
+                          ? "text-tractor-red"
+                          : scrolled || open
+                            ? "text-ink/70 hover:text-ink"
+                            : "text-white/90 hover:text-white"
                       }`}
                     >
                       {link.label}
@@ -94,7 +98,9 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
 
               <button
                 type="button"
-                className="grid h-11 w-11 place-items-center border border-ink/15 text-ink min-[1180px]:hidden"
+                className={`grid h-11 w-11 place-items-center border min-[1180px]:hidden transition-colors duration-[220ms] ${
+                  scrolled || open ? "border-ink/15 text-ink" : "border-white/30 text-white"
+                }`}
                 aria-label={open ? "Mbyll menunë" : "Hap menunë"}
                 aria-expanded={open}
                 aria-controls="mobile-nav"

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "db:dev": "prisma dev --name default",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
