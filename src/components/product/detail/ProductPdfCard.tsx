@@ -3,6 +3,7 @@ import type { PublicProduct } from "@/lib/types";
 import { publicPdfUrl } from "@/components/product/TechnicalPdfCta";
 import { t } from "@/lib/i18n";
 import { productContainer, productSection } from "./product-shell";
+import PdfDownloadButton from "./PdfDownloadButton";
 
 export default function ProductPdfCard({ product }: { product: PublicProduct }) {
   const href = publicPdfUrl(product);
@@ -24,6 +25,7 @@ export default function ProductPdfCard({ product }: { product: PublicProduct }) 
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
+            {/* View: opens PDF in a new browser tab */}
             <a
               href={href}
               target="_blank"
@@ -32,14 +34,11 @@ export default function ProductPdfCard({ product }: { product: PublicProduct }) 
             >
               {t.productDetail.pdfView} — {product.name}
             </a>
-            <a
-              href={href}
-              download
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center border border-ink/18 px-5 py-3 text-[12px] font-semibold tracking-[0.12em] uppercase text-ink transition hover:border-tractor-red hover:text-tractor-red"
-            >
-              {t.productDetail.pdfDownload} — {product.name}
-            </a>
+            {/* Download: streams via server route to force browser download */}
+            <PdfDownloadButton
+              slug={product.slug}
+              label={`${t.productDetail.pdfDownload} — ${product.name}`}
+            />
           </div>
         </div>
       </div>
