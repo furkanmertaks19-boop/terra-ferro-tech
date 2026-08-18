@@ -16,7 +16,7 @@ export default function GalleryView({
   return (
     <div className="bg-ivory pb-20 text-ink">
       <PageIntro page={page} />
-      <section className="container-site pt-8 md:pt-10">
+      <section className="container-site pt-6 md:pt-8">
         <GalleryExperience items={items} categories={categories} showFilters={config.showFilters} />
       </section>
     </div>
