@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "db:dev": "prisma dev --name default",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate",
     "sync:armatrac": "tsx scripts/sync-armatrac-specs.ts",
     "create-super-admin": "tsx scripts/create-super-admin.ts"
   },
