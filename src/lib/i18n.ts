@@ -103,7 +103,7 @@ const sq = {
     message: "Mesazhi",
     submit: "Dërgo Kërkesën",
     submitting: "Duke dërguar...",
-    success: "Faleminderit! Kërkesa juaj u dërgua me sukses. Do t'ju kontaktojmë së shpejti.",
+    success: "Kërkesa juaj u dërgua me sukses. Do t'ju kontaktojmë së shpejti.",
     error: "Diçka shkoi keq. Ju lutem provoni përsëri ose na kontaktoni në telefon.",
     orWhatsapp: "ose kontakto direkt në WhatsApp",
   },

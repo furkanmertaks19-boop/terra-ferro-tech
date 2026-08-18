@@ -9,13 +9,17 @@ import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { plainText } from "@/lib/sanitize";
 
 const leadSchema = z.object({
-  name: z.string().min(2).max(120),
-  phone: z.string().min(6).max(30),
-  email: z.string().email().optional().or(z.literal("")),
-  subject: z.string().max(120).optional().or(z.literal("")),
-  message: z.string().max(2000).optional().or(z.literal("")),
-  productId: z.string().optional(),
-  usedTractorId: z.string().optional(),
+  name: z.string().trim().min(2).max(120),
+  phone: z.string().trim().min(6).max(40),
+  email: z
+    .string()
+    .trim()
+    .max(120)
+    .refine((value) => value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value), "invalid"),
+  subject: z.string().trim().max(120),
+  message: z.string().trim().max(2000),
+  productId: z.string().trim().min(1).optional(),
+  usedTractorId: z.string().trim().min(1).optional(),
 });
 
 export type LeadFormState = {
@@ -23,63 +27,83 @@ export type LeadFormState = {
   error?: string;
 };
 
+function formString(value: FormDataEntryValue | null) {
+  return typeof value === "string" ? value : "";
+}
+
+function formOptionalId(value: FormDataEntryValue | null) {
+  const text = formString(value).trim();
+  return text || undefined;
+}
+
 export async function createLead(
   _prevState: LeadFormState,
   formData: FormData
 ): Promise<LeadFormState> {
-  if (String(formData.get("company_website") ?? "").trim()) {
+  try {
+    if (formString(formData.get("company_website")).trim()) {
+      return { success: true };
+    }
+
+    const ip = clientIp(await headers());
+    if (!rateLimit(`lead:${ip}`, 6, 10 * 60 * 1000).ok) {
+      return { success: false, error: "invalid" };
+    }
+
+    const parsed = leadSchema.safeParse({
+      name: formString(formData.get("name")),
+      phone: formString(formData.get("phone")),
+      email: formString(formData.get("email")),
+      subject: formString(formData.get("subject")),
+      message: formString(formData.get("message")),
+      productId: formOptionalId(formData.get("productId")),
+      usedTractorId: formOptionalId(formData.get("usedTractorId")),
+    });
+
+    if (!parsed.success) {
+      return { success: false, error: "invalid" };
+    }
+
+    const { name, phone, email, subject, message, productId, usedTractorId } = parsed.data;
+    const composed = [subject ? `Subjekti: ${plainText(subject, 120)}` : null, message ? plainText(message, 2000) : null]
+      .filter(Boolean)
+      .join("\n\n");
+
+    let productFk: string | null = productId ?? null;
+    let usedFk: string | null = usedTractorId ?? null;
+
+    if (usedFk) {
+      try {
+        const exists = await prisma.usedTractor.findUnique({ where: { id: usedFk }, select: { id: true } });
+        if (!exists) usedFk = null;
+        else productFk = null;
+      } catch (error) {
+        console.error("[createLead] usedTractor lookup failed", error);
+        usedFk = null;
+      }
+    } else if (productFk) {
+      const exists = await prisma.product.findUnique({ where: { id: productFk }, select: { id: true } });
+      if (!exists) productFk = null;
+    }
+
+    await prisma.lead.create({
+      data: {
+        name: plainText(name, 120),
+        phone: plainText(phone, 40),
+        email: email || null,
+        message: composed || null,
+        ...(productFk ? { productId: productFk } : {}),
+        ...(usedFk ? { usedTractorId: usedFk } : {}),
+      },
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/leads");
     return { success: true };
-  }
-
-  const ip = clientIp(await headers());
-  if (!rateLimit(`lead:${ip}`, 6, 10 * 60 * 1000).ok) {
+  } catch (error) {
+    console.error("[createLead]", error);
     return { success: false, error: "invalid" };
   }
-
-  const parsed = leadSchema.safeParse({
-    name: formData.get("name"),
-    phone: formData.get("phone"),
-    email: formData.get("email"),
-    subject: formData.get("subject"),
-    message: formData.get("message"),
-    productId: formData.get("productId") || undefined,
-    usedTractorId: formData.get("usedTractorId") || undefined,
-  });
-
-  if (!parsed.success) {
-    return { success: false, error: "invalid" };
-  }
-
-  const { name, phone, email, subject, message, productId, usedTractorId } = parsed.data;
-  const composed = [subject?.trim() ? `Subjekti: ${plainText(subject, 120)}` : null, message ? plainText(message, 2000) : null]
-    .filter(Boolean)
-    .join("\n\n");
-
-  let productFk: string | null = productId || null;
-  let usedFk: string | null = usedTractorId || null;
-  if (usedFk) {
-    const exists = await prisma.usedTractor.findUnique({ where: { id: usedFk }, select: { id: true } });
-    if (!exists) usedFk = null;
-    productFk = null;
-  } else if (productFk) {
-    const exists = await prisma.product.findUnique({ where: { id: productFk }, select: { id: true } });
-    if (!exists) productFk = null;
-  }
-
-  await prisma.lead.create({
-    data: {
-      name: plainText(name, 120),
-      phone: plainText(phone, 30),
-      email: email || null,
-      message: composed || null,
-      productId: productFk,
-      usedTractorId: usedFk,
-    },
-  });
-
-  revalidatePath("/admin");
-  revalidatePath("/admin/leads");
-  return { success: true };
 }
 
 export async function updateLeadStatus(id: string, status: "NEW" | "CONTACTED" | "QUOTED" | "COMPLETED") {
