@@ -13,18 +13,31 @@ export function Logo({
   variant?: "nav" | "footer";
   locale?: Locale;
 }) {
+  const isFooter = variant === "footer";
+
   return (
     <Link href={pathFor("home", locale)} onClick={onClick} className="inline-flex shrink-0 items-center" aria-label="Terra Ferro Tech">
-      <Image
-        src="/logo.png"
-        alt="Terra Ferro Tech"
-        width={240}
-        height={240}
-        priority={false}
-        className={`w-auto object-contain object-left ${
-          variant === "footer" ? "h-11 md:h-12" : "h-11 md:h-14"
-        }`}
-      />
+      {isFooter ? (
+        <Image
+          src="/logo.png"
+          alt="Terra Ferro Tech"
+          width={240}
+          height={240}
+          className="h-11 w-auto object-contain object-left md:h-12"
+        />
+      ) : (
+        <span className="relative block h-12 w-12 md:h-16 md:w-16">
+          <Image
+            src="/logo.png"
+            alt="Terra Ferro Tech"
+            width={240}
+            height={240}
+            priority
+            sizes="(max-width: 767px) 48px, 64px"
+            className="h-full w-full object-contain"
+          />
+        </span>
+      )}
     </Link>
   );
 }
