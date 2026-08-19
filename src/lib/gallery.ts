@@ -145,7 +145,8 @@ export async function getPublishedGalleryItems(): Promise<PublicGalleryItem[]> {
         ORDER BY i."sortOrder" ASC, i."createdAt" DESC
       `
     );
-    return rows.map((row) => mapPublic(row, await getRequestLocale()));
+    const locale = await getRequestLocale();
+    return rows.map((row) => mapPublic(row, locale));
   } catch {
     return [];
   }
