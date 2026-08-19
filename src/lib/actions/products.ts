@@ -61,6 +61,7 @@ const saveSchema = z.object({
   customBadgeTone: z.string().nullable().optional(),
   heroImageMode: z.string().optional(),
   referenceUrl: z.string().nullable().optional(),
+  i18n: z.any().optional(),
 });
 
 export type ProductSaveInput = z.infer<typeof saveSchema>;
@@ -204,6 +205,7 @@ function toLiveData(parsed: ProductSaveInput) {
     seoTitle: parsed.seoTitle || null,
     seoDescription: parsed.seoDescription || null,
     heroImageMode: resolveHeroImageMode(parsed.heroImageMode),
+    i18n: parsed.i18n ?? {},
   };
 }
 

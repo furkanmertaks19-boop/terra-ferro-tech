@@ -68,6 +68,7 @@ function fetchLeads() {
         createdAt: true,
         product: { select: { name: true, slug: true, category: true } },
         usedTractor: { select: { id: true, brand: true, model: true, slug: true } },
+        locale: true,
       },
     }),
   );

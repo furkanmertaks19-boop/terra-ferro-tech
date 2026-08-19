@@ -9,6 +9,7 @@ import FeatureListEditor from "@/components/admin/pages/FeatureListEditor";
 import PageLivePreview from "@/components/admin/pages/PageLivePreview";
 import SlideImageField from "@/components/admin/sliders/SlideImageField";
 import { useToast } from "@/components/admin/ui/Toast";
+import LocaleTabs, { missingHint } from "@/components/admin/ui/LocaleTabs";
 import { publishPage, savePage } from "@/lib/actions/pages";
 import {
   pageDef,
@@ -19,6 +20,9 @@ import {
   type PageKey,
   type PageRevision,
 } from "@/lib/page-cms";
+import { parseI18nBag, type Locale } from "@/lib/i18n/config";
+import { localeHasCopy } from "@/lib/i18n/config";
+import { str } from "@/lib/i18n/content";
 
 export default function PageEditor({
   pageKey,
@@ -40,11 +44,51 @@ export default function PageEditor({
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [open, setOpen] = useState<string>("hero");
+  const [editLocale, setEditLocale] = useState<Locale>("sq");
+  const i18n = parseI18nBag(revision.i18n);
+  const locCopy = editLocale === "sq" ? null : i18n[editLocale] ?? {};
 
   function update(next: PageRevision) {
     setRevision(next);
     setDirty(true);
   }
+
+  function setConfig(config: PageRevision["config"]) {
+    if (editLocale === "sq") update({ ...revision, config });
+    else patchLocalized({ config });
+  }
+
+  function patchLocalized(partial: { eyebrow?: string; title?: string; description?: string; config?: PageRevision["config"] }) {
+    if (editLocale === "sq") {
+      update({ ...revision, ...partial });
+      return;
+    }
+    const current = i18n[editLocale] ?? {};
+    update({
+      ...revision,
+      i18n: {
+        ...i18n,
+        [editLocale]: {
+          ...current,
+          ...(partial.eyebrow != null ? { eyebrow: partial.eyebrow } : {}),
+          ...(partial.title != null ? { title: partial.title } : {}),
+          ...(partial.description != null ? { description: partial.description } : {}),
+          ...(partial.config != null ? { config: partial.config } : {}),
+        },
+      },
+    });
+  }
+
+  const textRevision: PageRevision =
+    editLocale === "sq"
+      ? revision
+      : {
+          ...revision,
+          eyebrow: str(locCopy?.eyebrow),
+          title: str(locCopy?.title),
+          description: str(locCopy?.description),
+          config: (locCopy?.config as PageRevision["config"]) || revision.config,
+        };
 
   async function onSave() {
     setSaving(true);
@@ -83,10 +127,13 @@ export default function PageEditor({
     router.refresh();
   }
 
-  const about = parseAboutConfig(revision.config);
-  const services = parseServicesConfig(revision.config);
+  const aboutSq = parseAboutConfig(revision.config);
+  const servicesSq = parseServicesConfig(revision.config);
   const gallery = parseGalleryConfig(revision.config);
-  const contact = parseContactConfig(revision.config);
+  const contactSq = parseContactConfig(revision.config);
+  const about = editLocale === "sq" ? aboutSq : parseAboutConfig({ ...aboutSq, ...(typeof locCopy?.config === "object" ? locCopy.config : {}) });
+  const services = editLocale === "sq" ? servicesSq : parseServicesConfig({ ...servicesSq, ...(typeof locCopy?.config === "object" ? locCopy.config : {}) });
+  const contact = editLocale === "sq" ? contactSq : parseContactConfig({ ...contactSq, ...(typeof locCopy?.config === "object" ? locCopy.config : {}) });
 
   return (
     <div className="space-y-5">
@@ -102,6 +149,17 @@ export default function PageEditor({
           {unpublished ? (
             <p className="mt-2 text-sm text-amber-300">Yayınlanmamış değişiklik var. Kaydet public’i güncellemez.</p>
           ) : null}
+          <div className="mt-3">
+            <LocaleTabs
+              value={editLocale}
+              onChange={setEditLocale}
+              missing={{
+                en: !localeHasCopy(revision.i18n, "en", ["title", "description", "eyebrow"]),
+                tr: !localeHasCopy(revision.i18n, "tr", ["title", "description", "eyebrow"]),
+              }}
+            />
+            {missingHint(editLocale) ? <p className="mt-2 text-xs text-amber-300">{missingHint(editLocale)}</p> : null}
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" className="admin-btn admin-btn-ghost" onClick={() => void onPreview()}>
@@ -121,7 +179,33 @@ export default function PageEditor({
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-3">
           <Accordion id="hero" title="01 Hero" open={open} onToggle={setOpen}>
-            <HeroFields value={revision} onChange={update} />
+            <HeroFields
+              value={textRevision}
+              onChange={(next) => {
+                if (editLocale === "sq") update(next);
+                else {
+                  patchLocalized({ eyebrow: next.eyebrow, title: next.title, description: next.description });
+                  if (next.heroImage !== revision.heroImage || next.heroType !== revision.heroType || next.slides !== revision.slides) {
+                    update({
+                      ...revision,
+                      ...next,
+                      eyebrow: revision.eyebrow,
+                      title: revision.title,
+                      description: revision.description,
+                      i18n: {
+                        ...i18n,
+                        [editLocale]: {
+                          ...(i18n[editLocale] ?? {}),
+                          eyebrow: next.eyebrow,
+                          title: next.title,
+                          description: next.description,
+                        },
+                      },
+                    });
+                  }
+                }
+              }}
+            />
           </Accordion>
 
           {def.kind === "about" ? (
@@ -131,13 +215,13 @@ export default function PageEditor({
                 <input
                   className="admin-input"
                   value={about.introTitle}
-                  onChange={(e) => update({ ...revision, config: { ...about, introTitle: e.target.value } })}
+                  onChange={(e) => setConfig({ ...about, introTitle: e.target.value })}
                 />
                 <label className="admin-label mt-3">Metin</label>
                 <textarea
                   className="admin-textarea min-h-32"
                   value={about.introBody}
-                  onChange={(e) => update({ ...revision, config: { ...about, introBody: e.target.value } })}
+                  onChange={(e) => setConfig({ ...about, introBody: e.target.value })}
                 />
                 <div className="mt-4">
                   <SlideImageField
@@ -152,7 +236,7 @@ export default function PageEditor({
                 <FeatureListEditor
                   items={about.features}
                   addLabel="+ Yeni Madde"
-                  onChange={(features) => update({ ...revision, config: { ...about, features } })}
+                  onChange={(features) => setConfig({ ...about, features })}
                 />
               </Accordion>
               <Accordion id="cta" title="04 CTA" open={open} onToggle={setOpen}>
@@ -160,13 +244,13 @@ export default function PageEditor({
                 <input
                   className="admin-input"
                   value={about.ctaTitle}
-                  onChange={(e) => update({ ...revision, config: { ...about, ctaTitle: e.target.value } })}
+                  onChange={(e) => setConfig({ ...about, ctaTitle: e.target.value })}
                 />
                 <label className="admin-label mt-3">Buton metni</label>
                 <input
                   className="admin-input"
                   value={about.ctaLabel}
-                  onChange={(e) => update({ ...revision, config: { ...about, ctaLabel: e.target.value } })}
+                  onChange={(e) => setConfig({ ...about, ctaLabel: e.target.value })}
                 />
               </Accordion>
             </>
@@ -179,7 +263,7 @@ export default function PageEditor({
                   items={services.items}
                   withImage
                   addLabel="+ Yeni Hizmet"
-                  onChange={(items) => update({ ...revision, config: { ...services, items } })}
+                  onChange={(items) => setConfig({ ...services, items })}
                 />
               </Accordion>
               <Accordion id="cta" title="03 CTA" open={open} onToggle={setOpen}>
@@ -187,7 +271,7 @@ export default function PageEditor({
                 <input
                   className="admin-input"
                   value={services.ctaLabel}
-                  onChange={(e) => update({ ...revision, config: { ...services, ctaLabel: e.target.value } })}
+                  onChange={(e) => setConfig({ ...services, ctaLabel: e.target.value })}
                 />
               </Accordion>
             </>
@@ -218,43 +302,43 @@ export default function PageEditor({
               <input
                 className="admin-input"
                 value={contact.formTitle}
-                onChange={(e) => update({ ...revision, config: { ...contact, formTitle: e.target.value } })}
+                onChange={(e) => setConfig({ ...contact, formTitle: e.target.value })}
               />
               <label className="admin-label mt-3">Gönder butonu</label>
               <input
                 className="admin-input"
                 value={contact.submitLabel}
-                onChange={(e) => update({ ...revision, config: { ...contact, submitLabel: e.target.value } })}
+                onChange={(e) => setConfig({ ...contact, submitLabel: e.target.value })}
               />
               <label className="admin-label mt-3">Ad soyad</label>
               <input
                 className="admin-input"
                 value={contact.nameLabel}
-                onChange={(e) => update({ ...revision, config: { ...contact, nameLabel: e.target.value } })}
+                onChange={(e) => setConfig({ ...contact, nameLabel: e.target.value })}
               />
               <label className="admin-label mt-3">Telefon</label>
               <input
                 className="admin-input"
                 value={contact.phoneLabel}
-                onChange={(e) => update({ ...revision, config: { ...contact, phoneLabel: e.target.value } })}
+                onChange={(e) => setConfig({ ...contact, phoneLabel: e.target.value })}
               />
               <label className="admin-label mt-3">E-posta</label>
               <input
                 className="admin-input"
                 value={contact.emailLabel}
-                onChange={(e) => update({ ...revision, config: { ...contact, emailLabel: e.target.value } })}
+                onChange={(e) => setConfig({ ...contact, emailLabel: e.target.value })}
               />
               <label className="admin-label mt-3">Konu</label>
               <input
                 className="admin-input"
                 value={contact.subjectLabel}
-                onChange={(e) => update({ ...revision, config: { ...contact, subjectLabel: e.target.value } })}
+                onChange={(e) => setConfig({ ...contact, subjectLabel: e.target.value })}
               />
               <label className="admin-label mt-3">Mesaj</label>
               <input
                 className="admin-input"
                 value={contact.messageLabel}
-                onChange={(e) => update({ ...revision, config: { ...contact, messageLabel: e.target.value } })}
+                onChange={(e) => setConfig({ ...contact, messageLabel: e.target.value })}
               />
             </Accordion>
           ) : null}

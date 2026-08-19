@@ -3,12 +3,12 @@ import { Category } from "@prisma/client";
 import { getProductList, parseListFilters } from "@/lib/products";
 import { getPublishedPage } from "@/lib/pages";
 import TractorsListing from "@/components/catalog/TractorsListing";
-import { PAGE_SEO, publicPageMetadata } from "@/lib/seo";
+import { localePageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return publicPageMetadata(PAGE_SEO.traktoret);
+  return localePageMetadata("traktoret");
 }
 
 export default async function TractorsPage({

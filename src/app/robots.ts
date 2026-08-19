@@ -11,7 +11,9 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
   const usedEnabled = await isUsedTractorsEnabled();
   const disallow = ["/admin/", "/login/", "/api/", "/preview/", "/admin/preview/"];
-  if (!usedEnabled) disallow.push("/traktore-te-perdorur", "/traktore-te-perdorur/");
+  if (!usedEnabled) {
+    disallow.push("/traktore-te-perdorur", "/traktore-te-perdorur/", "/en/used-tractors", "/tr/ikinci-el-traktorler");
+  }
 
   return {
     rules: {

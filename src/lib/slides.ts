@@ -2,6 +2,10 @@ import { prisma, withPrismaRetry } from "./prisma";
 import { isSlidePosition, type PublicHeroSlide } from "./slide-types";
 import type { HomeSlide } from "@prisma/client";
 import type { AdminSlide } from "./slide-types";
+import { getRequestLocale } from "@/lib/i18n/request";
+import { parseI18nBag } from "@/lib/i18n/config";
+import { str } from "@/lib/i18n/content";
+import { localizeHref } from "@/lib/i18n/routing";
 
 export type { AdminSlide } from "./slide-types";
 
@@ -26,6 +30,7 @@ export function toAdminSlide(slide: HomeSlide): AdminSlide {
     updatedAt: slide.updatedAt.toISOString(),
     startsAt: slide.startsAt?.toISOString() ?? null,
     endsAt: slide.endsAt?.toISOString() ?? null,
+    i18n: "i18n" in slide ? slide.i18n : {},
   };
 }
 
@@ -49,21 +54,27 @@ export async function getActiveHomeSlides(): Promise<PublicHeroSlide[]> {
     return [];
   }
 
+  const locale = await getRequestLocale();
   return rows
     .filter((row) => row.desktopImage)
-    .map((row) => ({
-      id: row.id,
-      eyebrow: row.eyebrow,
-      title: row.title,
-      subtitle: row.subtitle,
-      desktopImage: row.desktopImage,
-      mobileImage: row.mobileImage,
-      primaryButtonText: row.primaryButtonText,
-      primaryButtonUrl: row.primaryButtonUrl,
-      secondaryButtonText: row.secondaryButtonText,
-      secondaryButtonUrl: row.secondaryButtonUrl,
-      contentPosition: isSlidePosition(row.contentPosition) ? row.contentPosition : "left-center",
-      overlayOpacity: Math.min(85, Math.max(0, row.overlayOpacity)),
-      autoplayDuration: Math.min(20000, Math.max(3000, row.autoplayDuration || 7000)),
-    }));
+    .map((row) => {
+      const copy = locale === "sq" ? {} : parseI18nBag(row.i18n)[locale] ?? {};
+      const primaryUrl = str(copy.primaryButtonUrl, row.primaryButtonUrl);
+      const secondaryUrl = str(copy.secondaryButtonUrl, row.secondaryButtonUrl);
+      return {
+        id: row.id,
+        eyebrow: str(copy.eyebrow, row.eyebrow),
+        title: str(copy.title, row.title),
+        subtitle: str(copy.subtitle, row.subtitle),
+        desktopImage: row.desktopImage,
+        mobileImage: row.mobileImage,
+        primaryButtonText: str(copy.primaryButtonText, row.primaryButtonText),
+        primaryButtonUrl: !primaryUrl || primaryUrl.startsWith("#") ? primaryUrl : localizeHref(primaryUrl, locale),
+        secondaryButtonText: str(copy.secondaryButtonText, row.secondaryButtonText),
+        secondaryButtonUrl: !secondaryUrl || secondaryUrl.startsWith("#") ? secondaryUrl : localizeHref(secondaryUrl, locale),
+        contentPosition: isSlidePosition(row.contentPosition) ? row.contentPosition : "left-center",
+        overlayOpacity: Math.min(85, Math.max(0, row.overlayOpacity)),
+        autoplayDuration: Math.min(20000, Math.max(3000, row.autoplayDuration || 7000)),
+      };
+    });
 }

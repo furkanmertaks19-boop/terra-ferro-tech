@@ -1,10 +1,14 @@
+"use client";
+
 import type { PublicProduct } from "@/lib/types";
 import { visibleSpecGroups } from "@/lib/specs";
 import { Reveal } from "@/components/motion/Reveal";
 import { productContainer, productEyebrow, productSection, productTitle } from "./product-shell";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 
-export default function ProductSpecs({ product }: { product: PublicProduct }) {
+export default function ProductSpecs({
+  product }: { product: PublicProduct }) {
+  const t = useT();
   const groups = visibleSpecGroups(product);
   if (groups.length === 0) return null;
 

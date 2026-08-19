@@ -4,7 +4,7 @@ import { useActionState, useEffect } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { X } from "@phosphor-icons/react";
 import { createLead, type LeadFormState } from "@/lib/actions/leads";
-import { t } from "@/lib/i18n";
+import { useT, useLocale } from "@/components/i18n/LocaleProvider";
 import { useQuote } from "./QuoteProvider";
 
 const initialState: LeadFormState = { success: false };
@@ -14,6 +14,8 @@ const fieldClass =
 const labelClass = "mb-1.5 block text-[12px] font-semibold tracking-[0.08em] uppercase text-ink/50";
 
 export default function QuoteModal() {
+  const t = useT();
+  const locale = useLocale();
   const { open, closeQuote, productId, usedTractorId, productLabel, contact } = useQuote();
   const reduce = useReducedMotion();
   const [state, formAction, pending] = useActionState(createLead, initialState);
@@ -33,9 +35,7 @@ export default function QuoteModal() {
   }, [open, closeQuote]);
 
   const whatsappText = encodeURIComponent(
-    productLabel
-      ? `Përshëndetje, jam i interesuar për ${productLabel}.`
-      : "Përshëndetje, dua informacion për ofertë.",
+    productLabel ? t.quoteForm.whatsappInterest.replace("{product}", productLabel) : t.quoteForm.whatsappGeneric,
   );
 
   return (
@@ -91,6 +91,7 @@ export default function QuoteModal() {
                   </div>
                   {productId && <input type="hidden" name="productId" value={productId} />}
                   {usedTractorId && <input type="hidden" name="usedTractorId" value={usedTractorId} />}
+                  <input type="hidden" name="locale" value={locale} />
                   {productLabel && (
                     <div>
                       <label htmlFor="quote-product" className={labelClass}>

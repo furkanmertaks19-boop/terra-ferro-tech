@@ -3,21 +3,23 @@ import type { PublicSiteSettings } from "@/lib/site-settings";
 import { publicNavLinks } from "@/lib/site-content";
 import { Logo } from "./Logo";
 import FooterQuoteButton from "./FooterQuoteButton";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE } from "@/lib/i18n/config";
 
-export default function Footer({ settings }: { settings: PublicSiteSettings }) {
-  const links = publicNavLinks(settings.usedTractorsEnabled);
+export default function Footer({ settings, locale = DEFAULT_LOCALE }: { settings: PublicSiteSettings; locale?: Locale }) {
+  const t = getDictionary(locale);
+  const links = publicNavLinks(settings.usedTractorsEnabled, locale, t);
   return (
     <footer className="border-t border-warm/10 bg-ink text-warm">
       <div className="container-site grid gap-8 pt-12 pb-6 md:grid-cols-12 md:gap-8 md:pt-16 md:pb-8">
         <div className="md:col-span-4">
-          <Logo variant="footer" />
-          <p className="mt-4 max-w-xs text-base leading-relaxed text-warm/60">
-            Përfaqësues i traktorëve ArmaTrac dhe makinerive bujqësore në Shqipëri.
-          </p>
+          <Logo variant="footer" locale={locale} />
+          <p className="mt-4 max-w-xs text-base leading-relaxed text-warm/60">{t.footer.tagline}</p>
         </div>
 
         <div className="md:col-span-3">
-          <p className="text-[13px] font-medium tracking-[0.18em] uppercase text-warm/45">Navigimi</p>
+          <p className="text-[13px] font-medium tracking-[0.18em] uppercase text-warm/45">{t.footer.navigation}</p>
           <ul className="mt-3 space-y-2 text-base text-warm/75">
             {links.map((link) => (
               <li key={link.href}>
@@ -30,7 +32,7 @@ export default function Footer({ settings }: { settings: PublicSiteSettings }) {
         </div>
 
         <div className="md:col-span-3">
-          <p className="text-[13px] font-medium tracking-[0.18em] uppercase text-warm/45">Kontakt</p>
+          <p className="text-[13px] font-medium tracking-[0.18em] uppercase text-warm/45">{t.footer.contact}</p>
           <ul className="mt-3 space-y-2 text-base leading-relaxed text-warm/75">
             <li>
               <a href={`mailto:${settings.email}`} className="transition hover:text-tractor-red">
@@ -54,7 +56,7 @@ export default function Footer({ settings }: { settings: PublicSiteSettings }) {
       <div className="border-t border-warm/10">
         <div className="container-site py-5 text-sm text-warm/40">
           <p>
-            © {new Date().getFullYear()} {settings.companyName}. Të gjitha të drejtat e rezervuara.
+            © {new Date().getFullYear()} {settings.companyName}. {t.footer.rights}
           </p>
         </div>
       </div>

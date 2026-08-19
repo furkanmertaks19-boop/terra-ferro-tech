@@ -10,6 +10,8 @@ import {
   isProductionIndexingEnabled,
   robotsDirective,
 } from "@/lib/seo";
+import { headers } from "next/headers";
+import { LOCALE_HTML, isLocale, LOCALE_HEADER } from "@/lib/i18n/config";
 
 const barlow = Barlow_Condensed({
   variable: "--font-barlow",
@@ -84,10 +86,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const localeHeader = (await headers()).get(LOCALE_HEADER);
+  const locale = isLocale(localeHeader) ? localeHeader : "sq";
   return (
     <html
-      lang="sq"
+      lang={LOCALE_HTML[locale]}
       className={`${barlow.variable} ${inter.variable} ${archivo.variable} ${manrope.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-ivory font-sans text-ink">{children}</body>

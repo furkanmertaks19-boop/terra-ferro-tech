@@ -42,6 +42,7 @@ export type HomeSectionRecord = {
   sortOrder: number;
   isVisible: boolean;
   updatedAt: string;
+  i18n?: unknown;
 };
 
 export type HomeSectionTemplate = {

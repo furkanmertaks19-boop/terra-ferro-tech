@@ -52,4 +52,5 @@ export type AdminSlide = {
   updatedAt: string;
   startsAt: string | null;
   endsAt: string | null;
+  i18n?: unknown;
 };

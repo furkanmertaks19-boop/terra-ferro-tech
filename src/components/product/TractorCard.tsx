@@ -1,11 +1,10 @@
-import Link from "next/link";
+import LocaleLink from "@/components/i18n/LocaleLink";
 import Image from "next/image";
 import { ArrowUpRight } from "@phosphor-icons/react/ssr";
-import { productHref } from "@/lib/product-path";
+import { productHref, productImageAlt } from "@/lib/product-path";
 import { coverUrl, type PublicProduct } from "@/lib/types";
 import ProductBadges from "./ProductBadges";
 import QuoteButton from "./QuoteButton";
-import { productImageAlt } from "@/lib/seo";
 
 export default function TractorCard({ product }: { product: PublicProduct; index?: number }) {
   const cover = coverUrl(product);
@@ -17,7 +16,7 @@ export default function TractorCard({ product }: { product: PublicProduct; index
 
   return (
     <article className="group flex h-full min-w-0 flex-col border border-ink/10 bg-warm-white transition-[border-color] duration-300 ease-out-expo hover:border-tractor-red/45">
-      <Link href={productHref(product)} className="flex min-w-0 flex-1 flex-col">
+      <LocaleLink href={productHref(product)} className="flex min-w-0 flex-1 flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-[#e8e3d8]">
           <ProductBadges
             isNew={product.isNew}
@@ -51,7 +50,7 @@ export default function TractorCard({ product }: { product: PublicProduct; index
             <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>
         </div>
-      </Link>
+      </LocaleLink>
       <div className="border-t border-ink/10 px-4 py-3 sm:px-5">
         <QuoteButton productId={product.id} productLabel={product.fullTitle} className="w-full min-w-0 px-3 py-2.5 sm:px-5 sm:py-3" />
       </div>

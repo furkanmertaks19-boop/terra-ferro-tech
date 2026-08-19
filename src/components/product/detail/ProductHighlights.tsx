@@ -1,10 +1,14 @@
+"use client";
+
 import type { PublicProduct } from "@/lib/types";
 import { productHighlights } from "@/lib/specs";
 import { Reveal } from "@/components/motion/Reveal";
 import { productContainer } from "./product-shell";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 
-export default function ProductHighlights({ product }: { product: PublicProduct }) {
+export default function ProductHighlights({
+  product }: { product: PublicProduct }) {
+  const t = useT();
   const items = productHighlights(product);
   if (items.length === 0) return null;
 

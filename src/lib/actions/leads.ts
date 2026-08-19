@@ -17,10 +17,11 @@ const leadSchema = z.object({
     .max(120)
     .refine((value) => value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value), "invalid"),
   subject: z.string().trim().max(120),
-  message: z.string().trim().max(2000),
-  productId: z.string().trim().min(1).optional(),
-  usedTractorId: z.string().trim().min(1).optional(),
-});
+    message: z.string().trim().max(2000),
+    productId: z.string().trim().min(1).optional(),
+    usedTractorId: z.string().trim().min(1).optional(),
+    locale: z.enum(["sq", "en", "tr"]).optional(),
+  });
 
 export type LeadFormState = {
   success: boolean;
@@ -58,13 +59,14 @@ export async function createLead(
       message: formString(formData.get("message")),
       productId: formOptionalId(formData.get("productId")),
       usedTractorId: formOptionalId(formData.get("usedTractorId")),
+      locale: formString(formData.get("locale")) || undefined,
     });
 
     if (!parsed.success) {
       return { success: false, error: "invalid" };
     }
 
-    const { name, phone, email, subject, message, productId, usedTractorId } = parsed.data;
+    const { name, phone, email, subject, message, productId, usedTractorId, locale } = parsed.data;
     const composed = [subject ? `Subjekti: ${plainText(subject, 120)}` : null, message ? plainText(message, 2000) : null]
       .filter(Boolean)
       .join("\n\n");
@@ -94,6 +96,7 @@ export async function createLead(
         message: composed || null,
         ...(productFk ? { productId: productFk } : {}),
         ...(usedFk ? { usedTractorId: usedFk } : {}),
+        locale: locale ?? "sq",
       },
     });
 

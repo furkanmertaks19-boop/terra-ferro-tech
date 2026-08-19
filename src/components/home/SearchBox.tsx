@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 import type { PublicProduct } from "@/lib/types";
 import { productHref } from "@/lib/product-path";
 
 export default function SearchBox() {
+  const t = useT();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PublicProduct[]>([]);
   const [open, setOpen] = useState(false);

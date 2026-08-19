@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Category } from "@prisma/client";
 import { productHref } from "@/lib/product-path";
 import { usedTractorHref, usedTractorLabel, type PublicUsedTractor } from "@/lib/used-tractors";
+import { alternatePaths, pathFor, localeFromPathname } from "@/lib/i18n/routing";
+import { DEFAULT_LOCALE, LOCALES, LOCALE_OG, type Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getRequestLocale } from "@/lib/i18n/request";
 
 export const SITE_URL = "https://www.terraferrotech.com";
 export const SITE_NAME = "Terra Ferro Tech";
@@ -19,57 +23,31 @@ export const HOME_TITLE = "Terra Ferro Tech | Traktorë dhe Makineri Bujqësore 
 export const HOME_DESCRIPTION =
   "Terra Ferro Tech ofron traktorë ArmaTrac, makineri bujqësore, këshillim teknik dhe mbështetje për fermerët në Shqipëri, me qendër në Lushnje.";
 
-export const PAGE_SEO = {
-  home: {
-    path: "/",
-    title: HOME_TITLE,
-    description: HOME_DESCRIPTION,
-    absoluteTitle: true,
-  },
-  traktoret: {
-    path: "/traktoret",
-    title: "Traktorë ArmaTrac në Shqipëri",
-    description:
-      "Shikoni traktorët ArmaTrac të Terra Ferro Tech: seri, fuqi HP, kabinë ose ROPS. Kërkoni ofertë për fermën tuaj në Shqipëri.",
-  },
-  equipment: {
-    path: "/makineri-bujqesore",
-    title: "Makineri Bujqësore në Shqipëri",
-    description:
-      "Kultivatorë, rotovatorë, plugje dhe pajisje të tjera bujqësore nga Terra Ferro Tech në Lushnje. Zgjidhni modelin dhe kërkoni ofertë.",
-  },
-  gallery: {
-    path: "/galeri",
-    title: "Galeria",
-    description:
-      "Foto dhe video nga traktorët, makineritë bujqësore dhe puna e Terra Ferro Tech në Shqipëri.",
-  },
-  about: {
-    path: "/rreth-nesh",
-    title: "Rreth Nesh",
-    description:
-      "Terra Ferro Tech është partneri juaj në Lushnje për traktorë ArmaTrac, makineri bujqësore dhe mbështetje pas shitjes në Shqipëri.",
-  },
-  services: {
-    path: "/sherbimet",
-    title: "Shërbimet",
-    description:
-      "Konsulencë për zgjedhjen e traktorit, shitje, pjesë këmbimi, mbështetje teknike dhe servis nga Terra Ferro Tech.",
-  },
-  contact: {
-    path: "/kontakt",
-    title: "Kontakt",
-    description:
-      "Na shkruani ose na telefononi në Lushnje. Terra Ferro Tech — traktorë, makineri bujqësore dhe kërkesë për ofertë në Shqipëri.",
-  },
-} as const;
+export function localizedPageSeo(locale: Locale = DEFAULT_LOCALE) {
+  const t = getDictionary(locale);
+  return {
+    home: { path: pathFor("home", locale), title: t.seo.homeTitle, description: t.seo.homeDescription, absoluteTitle: true as const },
+    traktoret: { path: pathFor("tractors", locale), title: t.seo.tractorsTitle, description: t.seo.tractorsDescription },
+    equipment: { path: pathFor("equipment", locale), title: t.seo.equipmentTitle, description: t.seo.equipmentDescription },
+    gallery: { path: pathFor("gallery", locale), title: t.seo.galleryTitle, description: t.seo.galleryDescription },
+    about: { path: pathFor("about", locale), title: t.seo.aboutTitle, description: t.seo.aboutDescription },
+    services: { path: pathFor("services", locale), title: t.seo.servicesTitle, description: t.seo.servicesDescription },
+    contact: { path: pathFor("contact", locale), title: t.seo.contactTitle, description: t.seo.contactDescription },
+    used: { path: pathFor("used", locale), title: t.seo.usedTitle, description: t.seo.usedDescription },
+  };
+}
 
-export const USED_TRACTORS_SEO = {
-  path: "/traktore-te-perdorur",
-  title: "Traktorë të Përdorur në Shqipëri",
-  description:
-    "Traktorë të përdorur të zgjedhur me kujdes nga Terra Ferro Tech në Lushnje. Shikoni vitin, orët e punës, fuqinë HP dhe kërkoni ofertë.",
-} as const;
+export const PAGE_SEO = localizedPageSeo("sq");
+export const USED_TRACTORS_SEO = localizedPageSeo("sq").used;
+
+export async function localePageMetadata(
+  key: keyof ReturnType<typeof localizedPageSeo>,
+  extra?: { index?: boolean; image?: string | null },
+) {
+  const locale = await getRequestLocale();
+  const page = localizedPageSeo(locale)[key];
+  return publicPageMetadata({ ...page, ...extra, locale });
+}
 
 export function absoluteUrl(path = "/") {
   if (/^https?:\/\//i.test(path)) return path;
@@ -104,6 +82,7 @@ export function publicPageMetadata({
   absoluteTitle = false,
   image,
   index = true,
+  locale,
 }: {
   path: string;
   title: string;
@@ -111,17 +90,28 @@ export function publicPageMetadata({
   absoluteTitle?: boolean;
   image?: string | null;
   index?: boolean;
+  locale?: Locale;
 }): Metadata {
+  const loc = locale ?? localeFromPathname(path);
   const url = absoluteUrl(path);
   const ogImage = image ? absoluteUrl(image) : absoluteUrl(DEFAULT_OG_IMAGE);
+  const alts = alternatePaths(path);
   return {
     title: absoluteTitle ? { absolute: title } : title,
     description,
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      languages: {
+        sq: absoluteUrl(alts.sq),
+        en: absoluteUrl(alts.en),
+        tr: absoluteUrl(alts.tr),
+        "x-default": absoluteUrl(alts.sq),
+      },
+    },
     robots: robotsDirective(index),
     openGraph: {
       type: "website",
-      locale: SITE_LOCALE,
+      locale: LOCALE_OG[loc],
       url,
       siteName: SITE_NAME,
       title: absoluteTitle ? title : `${title} | ${SITE_NAME}`,
@@ -152,10 +142,7 @@ function hpLabel(horsePower: number | null | undefined) {
   return Number.isInteger(horsePower) ? String(horsePower) : String(horsePower);
 }
 
-export function productImageAlt(product: { name: string; category: Category }) {
-  if (product.category === Category.TRACTOR) return `ArmaTrac ${product.name} traktor`;
-  return product.name;
-}
+export { productImageAlt } from "@/lib/product-path";
 
 export function productSeoTitle(product: {
   name: string;
@@ -189,7 +176,7 @@ export function productSeoDescription(product: {
 
   const fromCopy = plainText(product.shortDescription || product.description, 140);
   if (fromCopy) {
-    const suffix = " Kërkoni ofertë nga Terra Ferro Tech në Shqipëri.";
+    const suffix = getDictionary(DEFAULT_LOCALE).seo.quoteSuffix;
     return plainText(`${fromCopy}${fromCopy.endsWith(".") ? "" : "."}${suffix}`, 160);
   }
 
@@ -214,7 +201,7 @@ export function productSeoDescription(product: {
   return plainText(`${lead} Specifikime teknike dhe kërkesë për ofertë në Shqipëri.`, 160);
 }
 
-export function productMetadata(product: {
+export async function productMetadata(product: {
   name: string;
   slug: string;
   category: Category;
@@ -229,12 +216,13 @@ export function productMetadata(product: {
   seoDescription?: string | null;
   coverImage?: string | null;
   images?: string[] | null;
-}): Metadata {
-  const path = productHref(product);
+}): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const path = productHref(product, locale);
   const title = productSeoTitle(product);
   const description = productSeoDescription(product);
   const image = product.coverImage || product.images?.find(Boolean) || null;
-  return publicPageMetadata({ path, title, description, image });
+  return publicPageMetadata({ path, title, description, image, locale });
 }
 
 export function organizationJsonLd(settings?: {
@@ -341,23 +329,20 @@ export function productBreadcrumbJsonLd(product: { name: string; slug: string; c
   ]);
 }
 
-export function usedTractorMetadata(item: PublicUsedTractor): Metadata {
+export async function usedTractorMetadata(item: PublicUsedTractor): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const t = getDictionary(locale);
   const customTitle = item.seoTitle?.trim().replace(/\s*\|\s*Terra Ferro Tech\s*$/i, "");
-  const title = customTitle || `${usedTractorLabel(item)} i Përdorur`;
+  const title = customTitle || `${usedTractorLabel(item)}`;
   const customDescription = plainText(item.seoDescription, 160);
   const fromCopy = plainText(item.shortDescription || item.description, 140);
-  const hp = hpLabel(item.horsePower);
-  const bits = [`Traktor i përdorur ${usedTractorLabel(item)}`];
-  if (item.year) bits.push(`viti ${item.year}`);
-  if (hp) bits.push(`${hp} HP`);
-  if (item.hours != null) bits.push(`${item.hours.toLocaleString("sq-AL")} orë pune`);
-  const fallback = `${bits.join(", ")}. Shikoni specifikat dhe kërkoni ofertë nga Terra Ferro Tech në Shqipëri.`;
-  const description = customDescription || (fromCopy ? plainText(`${fromCopy}${fromCopy.endsWith(".") ? "" : "."} Kërkoni ofertë nga Terra Ferro Tech në Shqipëri.`, 160) : plainText(fallback, 160));
+  const description = customDescription || (fromCopy ? plainText(`${fromCopy}${fromCopy.endsWith(".") ? "" : "."}${t.seo.quoteSuffix}`, 160) : t.seo.usedDescription);
   return publicPageMetadata({
-    path: usedTractorHref(item.slug),
+    path: usedTractorHref(item.slug, locale),
     title,
     description,
     image: item.coverImage || item.images.find(Boolean) || null,
+    locale,
   });
 }
 

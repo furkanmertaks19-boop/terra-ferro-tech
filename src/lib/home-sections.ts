@@ -6,6 +6,10 @@ import {
   type HomeSectionType,
 } from "@/lib/home-section-types";
 import { ABOUT } from "@/lib/site-content";
+import { getRequestLocale } from "@/lib/i18n/request";
+import { parseI18nBag } from "@/lib/i18n/config";
+import { str } from "@/lib/i18n/content";
+import { localizeHref } from "@/lib/i18n/routing";
 
 const FALLBACK: HomeSectionRecord[] = [
   {
@@ -137,32 +141,38 @@ function mapSection(row: {
   sortOrder: number;
   isVisible: boolean;
   updatedAt: Date;
-}): HomeSectionRecord | null {
+  i18n?: unknown;
+}, locale: "sq" | "en" | "tr", forAdmin = false): HomeSectionRecord | null {
   if (!isHomeSectionType(row.type)) return null;
+  const copy = locale === "sq" || forAdmin ? {} : parseI18nBag(row.i18n)[locale] ?? {};
   return {
     id: row.id,
     type: row.type,
     variant: row.variant,
-    title: row.title,
-    eyebrow: row.eyebrow,
-    body: row.body,
+    title: str(copy.title, row.title),
+    eyebrow: str(copy.eyebrow, row.eyebrow),
+    body: str(copy.body, row.body),
     image: row.image,
     mobileImage: row.mobileImage,
-    ctaLabel: row.ctaLabel,
-    ctaHref: row.ctaHref,
+    ctaLabel: str(copy.ctaLabel, row.ctaLabel),
+    ctaHref: forAdmin ? row.ctaHref : localizeHref(row.ctaHref || "/", locale),
     config: parseHomeConfig(row.config),
     sortOrder: row.sortOrder,
     isVisible: row.isVisible,
     updatedAt: row.updatedAt.toISOString(),
+    i18n: row.i18n,
   };
 }
 
 export async function getHomeSections(includeHidden = false): Promise<HomeSectionRecord[]> {
+  const locale = includeHidden ? "sq" : await getRequestLocale();
   try {
     const rows = await withPrismaRetry(() =>
       prisma.homeSection.findMany({ orderBy: { sortOrder: "asc" } })
     );
-    const mapped = rows.map(mapSection).filter((row): row is HomeSectionRecord => Boolean(row));
+    const mapped = rows
+      .map((row) => mapSection(row, locale, includeHidden))
+      .filter((row): row is HomeSectionRecord => Boolean(row));
     if (!mapped.length) return includeHidden ? FALLBACK : FALLBACK.filter((row) => row.isVisible);
     return includeHidden ? mapped : mapped.filter((row) => row.isVisible);
   } catch {

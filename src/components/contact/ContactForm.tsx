@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { createLead, type LeadFormState } from "@/lib/actions/leads";
-import { t } from "@/lib/i18n";
+import { useT, useLocale } from "@/components/i18n/LocaleProvider";
 
 const initialState: LeadFormState = { success: false };
 
@@ -11,6 +11,7 @@ const fieldClass =
 const labelClass = "mb-1.5 block text-[12px] font-semibold tracking-[0.08em] uppercase text-ink/50";
 
 export default function ContactForm({
+  
   labels,
 }: {
   labels?: {
@@ -23,6 +24,8 @@ export default function ContactForm({
     messageLabel: string;
   };
 }) {
+  const t = useT();
+  const locale = useLocale();
   const [state, formAction, pending] = useActionState(createLead, initialState);
   const copy = {
     formTitle: labels?.formTitle || "Dërgoni një mesazh",
@@ -48,6 +51,7 @@ export default function ContactForm({
       <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden>
         <label htmlFor="company_website">Website</label>
         <input id="company_website" name="company_website" tabIndex={-1} autoComplete="off" />
+        <input type="hidden" name="locale" value={locale} />
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Field name="name" label={copy.nameLabel} required minLength={2} autoComplete="name" invalid={Boolean(state.error)} />

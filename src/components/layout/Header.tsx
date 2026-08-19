@@ -10,11 +10,15 @@ import { publicNavLinks } from "@/lib/site-content";
 import { useQuote } from "@/components/quote/QuoteProvider";
 import type { PublicSiteSettings } from "@/lib/site-settings";
 import { DURATION, EASE } from "@/lib/motion";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 
 export default function Header({ settings }: { settings: PublicSiteSettings }) {
   const pathname = usePathname();
   const { openQuote } = useQuote();
-  const links = publicNavLinks(settings.usedTractorsEnabled);
+  const locale = useLocale();
+  const t = useT();
+  const links = publicNavLinks(settings.usedTractorsEnabled, locale, t);
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
@@ -42,7 +46,7 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink"
       >
-        Kalo te përmbajtja
+        {t.nav.skipToContent}
       </a>
       <header className="fixed inset-x-0 top-0 z-[50]">
         <div
@@ -55,11 +59,11 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
           }`}
         >
           <div className="mx-auto flex min-h-[72px] max-w-[1480px] items-center justify-between gap-6 px-5 md:min-h-[78px] md:px-8">
-            <Logo />
+            <Logo locale={locale} />
 
             <nav
               className="pointer-events-none absolute inset-x-0 hidden justify-center min-[1180px]:flex"
-              aria-label="Kryesore"
+              aria-label={t.nav.main}
             >
               <div className="pointer-events-auto flex items-center gap-1 xl:gap-2">
                 {links.map((link) => {
@@ -88,12 +92,15 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
             </nav>
 
             <div className="flex items-center gap-3">
+              <div className={`hidden sm:block ${scrolled || open ? "" : ""}`}>
+                <LanguageSwitcher inverted={!scrolled && !open} />
+              </div>
               <button
                 type="button"
                 onClick={() => openQuote()}
-                className="btn-wipe hidden rounded-[3px] bg-tractor-red px-5 py-2.5 text-[12px] font-semibold tracking-[0.12em] uppercase text-white sm:inline-flex"
+                className="btn-wipe hidden rounded-[3px] bg-tractor-red px-4 py-2.5 text-[11px] font-semibold tracking-[0.12em] uppercase text-white sm:inline-flex xl:px-5 xl:text-[12px]"
               >
-                <span className="relative z-[1]">Kërko Ofertë</span>
+                <span className="relative z-[1]">{t.nav.quote}</span>
               </button>
 
               <button
@@ -101,7 +108,7 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
                 className={`grid h-11 w-11 place-items-center border min-[1180px]:hidden transition-colors duration-[220ms] ${
                   scrolled || open ? "border-ink/15 text-ink" : "border-white/30 text-white"
                 }`}
-                aria-label={open ? "Mbyll menunë" : "Hap menunë"}
+                aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
                 aria-expanded={open}
                 aria-controls="mobile-nav"
                 onClick={() => setOpen((v) => !v)}
@@ -122,7 +129,7 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
             exit={reduce ? { opacity: 0 } : { clipPath: "inset(0 0 100% 0)" }}
             transition={{ duration: reduce ? 0.2 : DURATION.slow, ease: EASE }}
           >
-            <nav id="mobile-nav" className="flex h-dvh flex-col px-6 pb-8 pt-24" aria-label="Menuja e lëvizshme">
+            <nav id="mobile-nav" className="flex h-dvh flex-col px-6 pb-8 pt-24" aria-label={t.nav.mobile}>
               <ul className="flex-1 space-y-1">
                 {links.map((link, i) => {
                   const active =
@@ -158,6 +165,10 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
                 })}
               </ul>
 
+              <div className="mt-6">
+                <LanguageSwitcher />
+              </div>
+
               <div className="mt-8 space-y-2 text-sm text-ink/65">
                 <a href={`tel:${settings.phoneHref}`} className="block hover:text-tractor-red">
                   {settings.phone}
@@ -175,7 +186,7 @@ export default function Header({ settings }: { settings: PublicSiteSettings }) {
                 }}
                 className="btn-wipe mt-6 w-full rounded-[3px] bg-tractor-red py-4 text-[13px] font-semibold tracking-[0.12em] uppercase text-white"
               >
-                <span className="relative z-[1]">Kërko Ofertë</span>
+                <span className="relative z-[1]">{t.nav.quote}</span>
               </button>
             </nav>
           </motion.div>

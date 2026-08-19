@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import GalleryView from "@/components/pages/GalleryView";
 import { getGalleryCategories, getPublishedGalleryItems } from "@/lib/gallery";
 import { getPublishedPage } from "@/lib/pages";
-import { PAGE_SEO, publicPageMetadata } from "@/lib/seo";
+import { localePageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return publicPageMetadata(PAGE_SEO.gallery);
+  return localePageMetadata("gallery");
 }
 
 export default async function GalleryPage() {

@@ -30,6 +30,7 @@ const saveSchema = z.object({
   ctaLabel: z.string(),
   ctaHref: z.string(),
   config: z.any().optional(),
+  i18n: z.any().optional(),
   isVisible: z.boolean().optional(),
 });
 
@@ -55,6 +56,7 @@ export async function saveHomeSection(input: HomeSectionSaveInput): Promise<Home
       ctaLabel: data.ctaLabel,
       ctaHref: data.ctaHref,
       config: parseHomeConfig(data.config) as Prisma.InputJsonValue,
+      i18n: (data.i18n ?? {}) as Prisma.InputJsonValue,
       isVisible: data.isVisible ?? undefined,
     },
   });

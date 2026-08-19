@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export type FilterConfig = {
   basePath: string;
@@ -13,6 +13,7 @@ export type FilterConfig = {
 };
 
 export default function FilterSidebar(config: FilterConfig) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
 

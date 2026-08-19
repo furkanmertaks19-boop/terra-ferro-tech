@@ -1,4 +1,6 @@
-import { t } from "@/lib/i18n";
+"use client";
+
+import { useT } from "@/components/i18n/LocaleProvider";
 import { resolveBadgeTone, toneClass } from "@/lib/badges";
 
 export default function ProductBadges({
@@ -14,6 +16,7 @@ export default function ProductBadges({
   customBadgeTone?: string | null;
   placement?: "overlay" | "inline";
 }) {
+  const t = useT();
   const custom = customBadge?.trim() || "";
   if (!isNew && !isCampaign && !custom) return null;
 

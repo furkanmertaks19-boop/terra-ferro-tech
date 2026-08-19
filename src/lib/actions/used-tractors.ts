@@ -38,6 +38,7 @@ const payloadSchema = z.object({
   status: statusSchema,
   seoTitle: z.string().max(120).nullable().optional(),
   seoDescription: z.string().max(300).nullable().optional(),
+  i18n: z.any().optional(),
 });
 
 export type UsedTractorPayload = z.infer<typeof payloadSchema>;
@@ -116,6 +117,7 @@ function toData(parsed: UsedTractorPayload, slug: string) {
     status: parsed.status,
     seoTitle: emptyToNull(parsed.seoTitle),
     seoDescription: emptyToNull(parsed.seoDescription),
+    i18n: parsed.i18n ?? {},
     publishedAt:
       parsed.status === UsedTractorStatus.DRAFT || parsed.status === UsedTractorStatus.ARCHIVED
         ? null

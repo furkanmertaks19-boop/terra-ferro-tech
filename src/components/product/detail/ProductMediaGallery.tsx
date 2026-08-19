@@ -5,7 +5,7 @@ import Image from "next/image";
 import { CaretLeft, CaretRight, X } from "@phosphor-icons/react";
 import { cinematicHeroUrl, galleryLightboxUrl } from "@/lib/cloudinary-media";
 import { cinematicHeroFit } from "@/lib/hero-image-mode";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function ProductMediaGallery({
   images,
@@ -18,6 +18,7 @@ export default function ProductMediaGallery({
   heroImageMode?: string | null;
   layout?: "hero" | "section";
 }) {
+  const t = useT();
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
   const touchX = useRef<number | null>(null);

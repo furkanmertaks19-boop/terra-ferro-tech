@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import UsedTractorsListing from "@/components/used/UsedTractorsListing";
-import { USED_TRACTORS_SEO, publicPageMetadata, robotsDirective } from "@/lib/seo";
+import { localePageMetadata, robotsDirective } from "@/lib/seo";
 import { isUsedTractorsEnabled, listPublicUsedTractors } from "@/lib/used-tractors";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   if (!(await isUsedTractorsEnabled())) {
-    return { robots: robotsDirective(false), title: USED_TRACTORS_SEO.title };
+    return { robots: robotsDirective(false) };
   }
-  return publicPageMetadata(USED_TRACTORS_SEO);
+  return localePageMetadata("used");
 }
 
 export default async function UsedTractorsPage() {

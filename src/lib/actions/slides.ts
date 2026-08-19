@@ -23,6 +23,7 @@ const slideSchema = z.object({
   autoplayDuration: z.number().min(3000).max(20000),
   startsAt: z.string().nullable().optional(),
   endsAt: z.string().nullable().optional(),
+  i18n: z.any().optional(),
 });
 
 export type SlideSaveInput = z.infer<typeof slideSchema>;
@@ -71,6 +72,7 @@ export async function saveSlide(input: SlideSaveInput): Promise<SlideSaveResult>
     autoplayDuration: data.autoplayDuration,
     startsAt: parseDate(data.startsAt),
     endsAt: parseDate(data.endsAt),
+    i18n: data.i18n ?? {},
   };
 
   if (data.id) {

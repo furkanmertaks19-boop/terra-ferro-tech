@@ -1,4 +1,4 @@
-import Link from "next/link";
+import LocaleLink from "@/components/i18n/LocaleLink";
 import Image from "next/image";
 import { ArrowUpRight } from "@phosphor-icons/react/ssr";
 import { UsedTractorDrive, UsedTractorStatus } from "@prisma/client";
@@ -36,7 +36,7 @@ export default function UsedTractorCard({ item }: { item: PublicUsedTractor }) {
 
   return (
     <article className="group flex h-full flex-col border border-ink/10 bg-warm-white">
-      <Link href={usedTractorHref(item.slug)} className="flex flex-1 flex-col">
+      <LocaleLink href={usedTractorHref(item.slug)} className="flex flex-1 flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-[#e8e3d8]">
           {badge ? (
             <span className={`absolute left-3 top-3 z-[2] px-2.5 py-1 text-[11px] font-semibold tracking-[0.14em] uppercase ${badge.className}`}>
@@ -68,7 +68,7 @@ export default function UsedTractorCard({ item }: { item: PublicUsedTractor }) {
             <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>
         </div>
-      </Link>
+      </LocaleLink>
       {!sold ? (
         <div className="border-t border-ink/10 px-5 py-3">
           <QuoteButton usedTractorId={item.id} productLabel={label} className="w-full" />

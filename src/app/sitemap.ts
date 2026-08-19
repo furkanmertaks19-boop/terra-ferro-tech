@@ -1,20 +1,41 @@
 import type { MetadataRoute } from "next";
 import { Category, ProductStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { PAGE_SEO, USED_TRACTORS_SEO, absoluteUrl, isProductionIndexingEnabled } from "@/lib/seo";
+import { absoluteUrl, isProductionIndexingEnabled } from "@/lib/seo";
 import { productHref } from "@/lib/product-path";
 import { isUsedTractorsEnabled, listSitemapUsedTractors, usedTractorHref } from "@/lib/used-tractors";
+import { LOCALES } from "@/lib/i18n/config";
+import { alternatePaths, pathFor } from "@/lib/i18n/routing";
+
+function entry(path: string, lastModified: Date, priority: number): MetadataRoute.Sitemap[number] {
+  const alts = alternatePaths(path);
+  return {
+    url: absoluteUrl(path),
+    lastModified,
+    changeFrequency: "weekly",
+    priority,
+    alternates: {
+      languages: {
+        sq: absoluteUrl(alts.sq),
+        en: absoluteUrl(alts.en),
+        tr: absoluteUrl(alts.tr),
+        "x-default": absoluteUrl(alts.sq),
+      },
+    },
+  };
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!isProductionIndexingEnabled()) return [];
 
   const now = new Date();
-  const staticPages = Object.values(PAGE_SEO).map((page) => ({
-    url: absoluteUrl(page.path),
-    lastModified: now,
-    changeFrequency: page.path === "/" ? "weekly" : "weekly",
-    priority: page.path === "/" ? 1 : page.path === "/traktoret" || page.path === "/makineri-bujqesore" ? 0.9 : 0.7,
-  })) satisfies MetadataRoute.Sitemap;
+  const staticKeys = ["home", "about", "tractors", "equipment", "gallery", "services", "contact"] as const;
+  const staticPages: MetadataRoute.Sitemap = [];
+  for (const key of staticKeys) {
+    for (const locale of LOCALES) {
+      staticPages.push(entry(pathFor(key, locale), now, key === "home" ? 1 : key === "tractors" || key === "equipment" ? 0.9 : 0.7));
+    }
+  }
 
   let products: MetadataRoute.Sitemap = [];
   try {
@@ -22,12 +43,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: { status: ProductStatus.PUBLISHED },
       select: { slug: true, category: true, updatedAt: true },
     });
-    products = rows.map((row) => ({
-      url: absoluteUrl(productHref({ category: row.category as Category, slug: row.slug })),
-      lastModified: row.updatedAt,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    }));
+    products = rows.flatMap((row) =>
+      LOCALES.map((locale) => entry(productHref({ category: row.category as Category, slug: row.slug }, locale), row.updatedAt, 0.8)),
+    );
   } catch (error) {
     console.error("[sitemap]", error instanceof Error ? error.message : error);
   }
@@ -36,45 +54,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     if (await isUsedTractorsEnabled()) {
       const rows = await listSitemapUsedTractors();
-      used = [
-        {
-          url: absoluteUrl(USED_TRACTORS_SEO.path),
-          lastModified: rows[0]?.updatedAt ?? now,
-          changeFrequency: "weekly",
-          priority: 0.8,
-        },
-        ...rows.map((row) => ({
-          url: absoluteUrl(usedTractorHref(row.slug)),
-          lastModified: row.updatedAt,
-          changeFrequency: "weekly" as const,
-          priority: 0.7,
-        })),
-      ];
+      used = LOCALES.flatMap((locale) => [
+        entry(pathFor("used", locale), rows[0]?.updatedAt ?? now, 0.8),
+        ...rows.map((row) => entry(usedTractorHref(row.slug, locale), row.updatedAt, 0.7)),
+      ]);
     }
   } catch (error) {
     console.error("[sitemap used]", error instanceof Error ? error.message : error);
-  }
-
-  try {
-    const pages = await prisma.pageContent.findMany({
-      select: { pageKey: true, updatedAt: true },
-    });
-    const pathByKey: Record<string, string> = {
-      about: "/rreth-nesh",
-      tractors: "/traktoret",
-      equipment: "/makineri-bujqesore",
-      gallery: "/galeri",
-      services: "/sherbimet",
-      contact: "/kontakt",
-    };
-    for (const page of pages) {
-      const path = pathByKey[page.pageKey];
-      if (!path) continue;
-      const entry = staticPages.find((item) => item.url === absoluteUrl(path));
-      if (entry) entry.lastModified = page.updatedAt;
-    }
-  } catch {
-    // keep generated dates
   }
 
   return [...staticPages, ...products, ...used];

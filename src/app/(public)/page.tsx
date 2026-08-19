@@ -13,7 +13,7 @@ import { getHomeSections } from "@/lib/home-sections";
 import { getPublishedGalleryItems } from "@/lib/gallery";
 import { getSiteSettings } from "@/lib/site-settings-data";
 import { getCurrentUser } from "@/lib/authz";
-import { PAGE_SEO, organizationJsonLd, publicPageMetadata, websiteJsonLd } from "@/lib/seo";
+import { localePageMetadata, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -24,10 +24,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const params = await searchParams;
   const preview = params.preview === "1";
-  return publicPageMetadata({
-    ...PAGE_SEO.home,
-    index: !preview,
-  });
+  return localePageMetadata("home", { index: !preview });
 }
 
 export default async function HomePage({

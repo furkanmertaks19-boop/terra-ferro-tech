@@ -1,10 +1,14 @@
+"use client";
+
 import type { PublicProduct } from "@/lib/types";
 import type { ContentBlock } from "@/lib/admin-content";
 import { Reveal } from "@/components/motion/Reveal";
 import { productContainer, productEyebrow, productSection, productTitle } from "./product-shell";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 
-export default function ProductFeatureList({ product }: { product: PublicProduct }) {
+export default function ProductFeatureList({
+  product }: { product: PublicProduct }) {
+  const t = useT();
   const blocks = ((product.contentBlocks as ContentBlock[] | undefined) ?? []).filter(
     (block) => block.type === "features" || block.type === "highlight",
   );

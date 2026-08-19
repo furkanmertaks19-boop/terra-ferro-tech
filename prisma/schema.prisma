@@ -98,6 +98,8 @@ model Product {
   imageAlts        Json    @default("{}")
   seoTitle         String?
   seoDescription   String?
+  /// { en: { name, fullTitle, ... }, tr: { ... } } — SQ lives in the columns above.
+  i18n             Json    @default("{}")
   coverImage       String?
   images           String[]
 
@@ -141,6 +143,9 @@ model Lead {
   usedTractor   UsedTractor? @relation(fields: [usedTractorId], references: [id], onDelete: SetNull)
   usedTractorId String?
 
+  /// Public form locale: sq | en | tr
+  locale    String     @default("sq")
+
   createdAt DateTime @default(now())
 
   @@index([readAt])
@@ -170,6 +175,7 @@ model HomeSlide {
   autoplayDuration Int    @default(7000)
   /// home | traktoret | makineri — which public page shows this slide
   pageKey         String @default("home")
+  i18n            Json   @default("{}")
 
   startsAt DateTime?
   endsAt   DateTime?
@@ -194,6 +200,7 @@ model CategoryPage {
 
   overlayOpacity Int    @default(45)
   textPosition   String @default("left")
+  i18n           Json   @default("{}")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -251,6 +258,7 @@ model UsedTractor {
 
   seoTitle       String?
   seoDescription String?
+  i18n           Json    @default("{}")
 
   sortOrder   Int       @default(0)
   publishedAt DateTime?
@@ -275,6 +283,7 @@ model ProductCategory {
   slug      String
   sortOrder Int     @default(0)
   isActive  Boolean @default(true)
+  i18n      Json    @default("{}")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -299,6 +308,7 @@ model HomeSection {
   ctaHref  String @default("")
 
   config    Json    @default("{}")
+  i18n      Json    @default("{}")
   sortOrder Int     @default(0)
   isVisible Boolean @default(true)
 
@@ -318,6 +328,7 @@ model GalleryCategory {
   name      String
   slug      String        @unique
   sortOrder Int           @default(0)
+  i18n      Json          @default("{}")
   items     GalleryItem[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
@@ -339,6 +350,7 @@ model GalleryItem {
   altText        String?
   sortOrder      Int              @default(0)
   isPublished    Boolean          @default(false)
+  i18n           Json             @default("{}")
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 
@@ -404,6 +416,7 @@ model PageContent {
   status                  String  @default("PUBLISHED")
   draftRevision           Json?
   hasUnpublishedChanges   Boolean @default(false)
+  i18n                    Json    @default("{}")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { createLead, type LeadFormState } from "@/lib/actions/leads";
-import { t } from "@/lib/i18n";
+import { useT, useLocale } from "@/components/i18n/LocaleProvider";
 import { useQuote } from "@/components/quote/QuoteProvider";
 
 const initialState: LeadFormState = { success: false };
@@ -16,6 +16,8 @@ export default function QuoteForm({
   usedTractorId?: string;
   productLabel?: string;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const [state, formAction, pending] = useActionState(createLead, initialState);
   const { contact } = useQuote();
 
@@ -38,6 +40,7 @@ export default function QuoteForm({
 
       <form action={formAction} className="relative mt-4 space-y-3">
         {productId && <input type="hidden" name="productId" value={productId} />}
+        <input type="hidden" name="locale" value={locale} />
         {usedTractorId && <input type="hidden" name="usedTractorId" value={usedTractorId} />}
         <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden>
           <label htmlFor="company_website">Website</label>

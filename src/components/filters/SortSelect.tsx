@@ -1,16 +1,16 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { t } from "@/lib/i18n";
-
-const options = [
-  { value: "newest", label: t.productList.sortNewest },
-  { value: "name-asc", label: "Emri A-Z" },
-  { value: "hp-asc", label: t.productList.sortHpAsc },
-  { value: "hp-desc", label: t.productList.sortHpDesc },
-];
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function SortSelect({ hideHp = false }: { hideHp?: boolean }) {
+  const t = useT();
+  const options = [
+    { value: "newest", label: t.productList.sortNewest },
+    { value: "name-asc", label: "A-Z" },
+    { value: "hp-asc", label: t.productList.sortHpAsc },
+    { value: "hp-desc", label: t.productList.sortHpDesc },
+  ];
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

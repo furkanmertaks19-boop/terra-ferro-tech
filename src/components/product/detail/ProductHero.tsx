@@ -1,3 +1,5 @@
+"use client";
+
 import { Category } from "@prisma/client";
 import { galleryUrls, type PublicProduct } from "@/lib/types";
 import { publicSubcategoryLabel } from "@/lib/product-path";
@@ -8,10 +10,12 @@ import ProductBadges from "@/components/product/ProductBadges";
 import QuoteButton from "@/components/product/QuoteButton";
 import ProductMediaGallery from "./ProductMediaGallery";
 import { productContainer } from "./product-shell";
-import { t } from "@/lib/i18n";
-import { productImageAlt } from "@/lib/seo";
+import { useT } from "@/components/i18n/LocaleProvider";
+import { productImageAlt } from "@/lib/product-path";
 
-export default function ProductHero({ product }: { product: PublicProduct }) {
+export default function ProductHero({
+  product }: { product: PublicProduct }) {
+  const t = useT();
   const images = galleryUrls(product);
   const highlights = productHighlights(product);
   const pdf = publicPdfUrl(product);

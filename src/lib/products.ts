@@ -1,5 +1,6 @@
 import { isDbConnectionError, prisma, withPrismaRetry } from "@/lib/prisma";
-import { toPublicProduct, type PublicProduct } from "@/lib/types";
+import { toPublicProduct, localizeProduct, type PublicProduct } from "@/lib/types";
+import { getRequestLocale } from "@/lib/i18n/request";
 import { EQUIPMENT_GROUPS, HP_RANGES } from "@/lib/templates";
 import { Category, Prisma, ProductStatus } from "@prisma/client";
 
@@ -22,6 +23,7 @@ export const publicProductSelect = {
   description: true,
   specs: true,
   specGroups: true,
+  i18n: true,
   coverImage: true,
   images: true,
   contentBlocks: true,
@@ -134,6 +136,10 @@ function mapPublic(row: Parameters<typeof toPublicProduct>[0]): PublicProduct {
   return toPublicProduct(row);
 }
 
+async function mapPublicLocalized(row: Parameters<typeof toPublicProduct>[0]): Promise<PublicProduct> {
+  return localizeProduct(toPublicProduct(row), await getRequestLocale());
+}
+
 async function withBadgeFields<T extends { id: string }>(rows: T[]) {
   if (rows.length === 0) return rows;
   try {
@@ -157,7 +163,8 @@ async function withBadgeFields<T extends { id: string }>(rows: T[]) {
 
 async function mapPublicRows(rows: Array<{ id: string }>) {
   const withBadges = await withBadgeFields(rows);
-  return withBadges.map((row) => toPublicProduct(row as unknown as Parameters<typeof toPublicProduct>[0]));
+  const locale = await getRequestLocale();
+  return withBadges.map((row) => localizeProduct(toPublicProduct(row as unknown as Parameters<typeof toPublicProduct>[0]), locale));
 }
 
 async function runProductQuery<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
@@ -261,7 +268,7 @@ export async function getProductBySlug(slug: string): Promise<PublicProduct | nu
   }, null);
   if (!product) return null;
   const extras = await readPublicExtras(product.id);
-  return mapPublic({ ...product, ...extras });
+  return mapPublicLocalized({ ...product, ...extras });
 }
 
 export async function getSimilarProducts(product: PublicProduct, take = 4): Promise<PublicProduct[]> {

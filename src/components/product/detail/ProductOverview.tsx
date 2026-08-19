@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { galleryUrls, type PublicProduct } from "@/lib/types";
 import { looksLikeHtml, type ContentBlock } from "@/lib/admin-content";
@@ -6,10 +8,12 @@ import { sanitizeRichHtml } from "@/lib/sanitize";
 import { Reveal } from "@/components/motion/Reveal";
 import ProductContentBlocks from "@/components/product/ProductContentBlocks";
 import { productBody, productContainer, productEyebrow, productSection, productTitle } from "./product-shell";
-import { t } from "@/lib/i18n";
-import { productImageAlt } from "@/lib/seo";
+import { useT } from "@/components/i18n/LocaleProvider";
+import { productImageAlt } from "@/lib/product-path";
 
-export default function ProductOverview({ product }: { product: PublicProduct }) {
+export default function ProductOverview({
+  product }: { product: PublicProduct }) {
+  const t = useT();
   const overview = product.description?.trim() || null;
   const blocks = ((product.contentBlocks as ContentBlock[] | undefined) ?? []).filter(
     (block) => block.type !== "features" && block.type !== "highlight",

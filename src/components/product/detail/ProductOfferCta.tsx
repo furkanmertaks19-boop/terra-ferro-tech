@@ -1,10 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import type { PublicProduct } from "@/lib/types";
 import QuoteButton from "@/components/product/QuoteButton";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { productContainer, productSection } from "./product-shell";
 
-export default function ProductOfferCta({ product }: { product: PublicProduct }) {
+export default function ProductOfferCta({
+  product }: { product: PublicProduct }) {
+  const t = useT();
   return (
     <section className={`${productSection} bg-warm-white`} aria-labelledby="product-offer">
       <div className={productContainer}>

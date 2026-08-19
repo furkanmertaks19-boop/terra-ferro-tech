@@ -1,5 +1,9 @@
 import { ABOUT, SERVICES } from "@/lib/site-content";
 import { uid } from "@/lib/admin-content";
+import { parseI18nBag, type I18nBag } from "@/lib/i18n/config";
+import type { Locale } from "@/lib/i18n/config";
+import { localizeHref } from "@/lib/i18n/routing";
+import { str } from "@/lib/i18n/content";
 
 export const PAGE_KEYS = ["about", "tractors", "equipment", "gallery", "services", "contact"] as const;
 export type PageKey = (typeof PAGE_KEYS)[number];
@@ -71,6 +75,7 @@ export type PageRevision = {
   heroHeight: HeroHeight;
   slides: PageHeroSlide[];
   config: PageConfig;
+  i18n?: I18nBag;
 };
 
 export type PublicPageHero = {
@@ -391,6 +396,7 @@ export function parseRevision(key: PageKey, value: unknown): PageRevision {
     heroHeight: typeof raw.heroHeight === "string" && isHeroHeight(raw.heroHeight) ? raw.heroHeight : fallback.heroHeight,
     slides: parseSlides(raw.slides),
     config: parseConfig(key, raw.config),
+    i18n: parseI18nBag(raw.i18n),
   };
 }
 
@@ -410,8 +416,56 @@ export function revisionToHero(revision: PageRevision): PublicPageHero {
   };
 }
 
-export function toPublicPage(key: PageKey, revision: PageRevision): PublicPageContent {
-  return { pageKey: key, ...revisionToHero(revision), config: revision.config };
+export function toPublicPage(key: PageKey, revision: PageRevision, locale: Locale = "sq"): PublicPageContent {
+  return { pageKey: key, ...revisionToHero(localizePageRevision(revision, locale)), config: localizePageRevision(revision, locale).config };
+}
+
+function localizeConfig(config: PageConfig, locale: Locale, overlay: unknown): PageConfig {
+  if (!config || typeof config !== "object") return config;
+  const extra = overlay && typeof overlay === "object" ? (overlay as Record<string, unknown>) : {};
+  const next = { ...config } as Record<string, unknown>;
+  for (const key of Object.keys(next)) {
+    if (typeof next[key] === "string" && key !== "ctaHref" && key !== "introImage") {
+      const localized = str(extra[key]);
+      if (localized) next[key] = localized;
+    }
+  }
+  if (Array.isArray((config as AboutConfig).features) && Array.isArray(extra.features)) {
+    next.features = mergeFeatureCopy((config as AboutConfig).features, extra.features);
+  }
+  if (Array.isArray((config as ServicesConfig).items) && Array.isArray(extra.items)) {
+    next.items = mergeFeatureCopy((config as ServicesConfig).items, extra.items);
+  }
+  if (typeof next.ctaHref === "string") next.ctaHref = localizeHref(next.ctaHref, locale);
+  return next as PageConfig;
+}
+
+function mergeFeatureCopy(base: PageFeatureItem[], overlay: unknown): PageFeatureItem[] {
+  if (!Array.isArray(overlay)) return base;
+  return base.map((item, index) => {
+    const row = overlay.find((entry) => entry && typeof entry === "object" && (entry as { id?: string }).id === item.id) as
+      | Record<string, unknown>
+      | undefined;
+    const fallback = overlay[index] && typeof overlay[index] === "object" ? (overlay[index] as Record<string, unknown>) : undefined;
+    const match = row ?? fallback;
+    if (!match) return item;
+    return {
+      ...item,
+      title: str(match.title, item.title),
+      body: str(match.body, item.body),
+    };
+  });
+}
+
+export function localizePageRevision(revision: PageRevision, locale: Locale): PageRevision {
+  const copy = locale === "sq" ? {} : parseI18nBag(revision.i18n)[locale] ?? {};
+  return {
+    ...revision,
+    eyebrow: str(copy.eyebrow, revision.eyebrow),
+    title: str(copy.title, revision.title),
+    description: str(copy.description, revision.description),
+    config: localizeConfig(revision.config, locale, copy.config),
+  };
 }
 
 export function publicPathFor(key: PageKey) {

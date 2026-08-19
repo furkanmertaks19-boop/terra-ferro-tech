@@ -1,27 +1,28 @@
-export const NAV_LINKS = [
-  { href: "/", label: "Ballina" },
-  { href: "/rreth-nesh", label: "Rreth Nesh" },
-  { href: "/traktoret", label: "Traktorët" },
-  { href: "/makineri-bujqesore", label: "Makineri Bujqësore" },
-  { href: "/galeri", label: "Galeria" },
-  { href: "/sherbimet", label: "Shërbimet" },
-  { href: "/kontakt", label: "Kontakt" },
-] as const;
-
-export const USED_TRACTORS_NAV = {
-  href: "/traktore-te-perdorur",
-  label: "Traktorë të Përdorur",
-} as const;
+import { getDictionary, type Messages } from "@/lib/i18n/dictionaries";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/config";
+import { pathFor } from "@/lib/i18n/routing";
 
 export type PublicNavLink = { href: string; label: string };
 
-export function publicNavLinks(usedTractorsEnabled: boolean): PublicNavLink[] {
-  if (!usedTractorsEnabled) return [...NAV_LINKS];
-  const links: PublicNavLink[] = [...NAV_LINKS];
-  const index = links.findIndex((link) => link.href === "/traktoret");
-  links.splice(index + 1, 0, USED_TRACTORS_NAV);
+export function publicNavLinks(usedTractorsEnabled: boolean, locale: Locale = DEFAULT_LOCALE, dict?: Messages): PublicNavLink[] {
+  const t = dict ?? getDictionary(locale);
+  const links: PublicNavLink[] = [
+    { href: pathFor("home", locale), label: t.nav.home },
+    { href: pathFor("about", locale), label: t.nav.about },
+    { href: pathFor("tractors", locale), label: t.nav.tractors },
+    { href: pathFor("equipment", locale), label: t.nav.equipment },
+    { href: pathFor("gallery", locale), label: t.nav.gallery },
+    { href: pathFor("services", locale), label: t.nav.services },
+    { href: pathFor("contact", locale), label: t.nav.contact },
+  ];
+  if (!usedTractorsEnabled) return links;
+  const index = links.findIndex((link) => link.href === pathFor("tractors", locale));
+  links.splice(index + 1, 0, { href: pathFor("used", locale), label: t.nav.usedTractors });
   return links;
 }
+
+export const NAV_LINKS = publicNavLinks(false);
+export const USED_TRACTORS_NAV = { href: pathFor("used"), label: getDictionary().nav.usedTractors };
 
 export const SERVICES = [
   {

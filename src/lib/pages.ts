@@ -1,16 +1,7 @@
 import { Category, Prisma } from "@prisma/client";
 import { prisma, withPrismaRetry } from "@/lib/prisma";
-import {
-  PAGE_DEFS,
-  PAGE_KEYS,
-  defaultRevision,
-  parseRevision,
-  publicPathFor,
-  revisionToHero,
-  type PageKey,
-  type PageRevision,
-  type PublicPageContent,
-} from "@/lib/page-cms";
+import { PAGE_DEFS, PAGE_KEYS, defaultRevision, parseRevision, publicPathFor, revisionToHero, localizePageRevision, type PageKey, type PageRevision, type PublicPageContent } from "@/lib/page-cms";
+import { getRequestLocale } from "@/lib/i18n/request";
 
 export type AdminPageRow = {
   key: PageKey;
@@ -37,6 +28,7 @@ function rowToRevision(key: PageKey, row: {
   heroHeight: string;
   slides: unknown;
   config: unknown;
+  i18n?: unknown;
 }): PageRevision {
   return parseRevision(key, {
     eyebrow: row.eyebrow,
@@ -50,6 +42,7 @@ function rowToRevision(key: PageKey, row: {
     heroHeight: row.heroHeight,
     slides: row.slides,
     config: row.config,
+    i18n: row.i18n,
   });
 }
 
@@ -109,7 +102,7 @@ export async function getPublishedPage(key: PageKey): Promise<PublicPageContent>
   const fallback = defaultRevision(key);
   try {
     const row = await withPrismaRetry(() => prisma.pageContent.findUnique({ where: { pageKey: key } }));
-    const revision = row ? rowToRevision(key, row) : fallback;
+    const revision = localizePageRevision(row ? rowToRevision(key, row) : fallback, await getRequestLocale());
     return { pageKey: key, ...revisionToHero(revision), config: revision.config };
   } catch {
     return { pageKey: key, ...revisionToHero(fallback), config: fallback.config };

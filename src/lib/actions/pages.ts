@@ -148,5 +148,6 @@ function liveFields(revision: PageRevision) {
     heroHeight: revision.heroHeight,
     slides: revision.slides as Prisma.InputJsonValue,
     config: revision.config as Prisma.InputJsonValue,
+    i18n: (revision.i18n ?? {}) as Prisma.InputJsonValue,
   };
 }

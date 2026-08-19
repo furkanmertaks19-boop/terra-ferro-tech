@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { CaretDown, Faders } from "@phosphor-icons/react";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function CatalogToolbar({
   hideHp = false,
@@ -14,6 +14,7 @@ export default function CatalogToolbar({
   searchPlaceholder?: string;
   showFilters?: boolean;
 }) {
+  const t = useT();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

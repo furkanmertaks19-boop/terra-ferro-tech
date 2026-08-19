@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import ContactView from "@/components/pages/ContactView";
 import { getPublishedPage } from "@/lib/pages";
 import { getSiteSettings } from "@/lib/site-settings-data";
-import { PAGE_SEO, publicPageMetadata } from "@/lib/seo";
+import { localePageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return publicPageMetadata(PAGE_SEO.contact);
+  return localePageMetadata("contact");
 }
 
 export default async function ContactPage() {

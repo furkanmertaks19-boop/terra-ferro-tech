@@ -1,6 +1,9 @@
 import { randomUUID } from "crypto";
 import { prisma, withPrismaRetry } from "@/lib/prisma";
 import { publicGalleryThumb } from "@/lib/cloudinary-media";
+import { getRequestLocale } from "@/lib/i18n/request";
+import { parseI18nBag } from "@/lib/i18n/config";
+import { str } from "@/lib/i18n/content";
 
 export type PublicGalleryCategory = {
   id: string;
@@ -55,6 +58,8 @@ type GalleryRow = {
   catId: string | null;
   catName: string | null;
   catSlug: string | null;
+  i18n?: unknown;
+  catI18n?: unknown;
 };
 
 function newId() {
@@ -79,18 +84,22 @@ function mapRow(row: GalleryRow): AdminGalleryItem {
   };
 }
 
-function mapPublic(row: GalleryRow): PublicGalleryItem {
+function mapPublic(row: GalleryRow, locale: "sq" | "en" | "tr" = "sq"): PublicGalleryItem {
   const item = mapRow(row);
+  const copy = locale === "sq" ? {} : parseI18nBag(row.i18n)[locale] ?? {};
+  const catCopy = locale === "sq" ? {} : parseI18nBag(row.catI18n)[locale] ?? {};
   return {
     id: item.id,
     type: item.type,
-    title: item.title,
-    description: item.description,
-    altText: item.altText,
+    title: str(copy.title) || item.title,
+    description: str(copy.description) || item.description,
+    altText: str(copy.altText) || item.altText,
     mediaUrl: item.mediaUrl,
     thumbnailUrl: publicGalleryThumb(item),
     categoryId: item.categoryId,
-    category: item.category,
+    category: item.category
+      ? { ...item.category, name: str(catCopy.name, item.category.name) }
+      : null,
     sortOrder: item.sortOrder,
   };
 }
@@ -128,14 +137,15 @@ export async function getPublishedGalleryItems(): Promise<PublicGalleryItem[]> {
         SELECT
           i.id, i.type, i.title, i.description, i."altText", i."mediaUrl", i."publicId",
           i."thumbnailUrl", i."posterPublicId", i."categoryId", i."sortOrder", i."isPublished",
-          c.id AS "catId", c.name AS "catName", c.slug AS "catSlug"
+          i.i18n,
+          c.id AS "catId", c.name AS "catName", c.slug AS "catSlug", c.i18n AS "catI18n"
         FROM "GalleryItem" i
         LEFT JOIN "GalleryCategory" c ON c.id = i."categoryId"
         WHERE i."isPublished" = TRUE
         ORDER BY i."sortOrder" ASC, i."createdAt" DESC
       `
     );
-    return rows.map(mapPublic);
+    return rows.map((row) => mapPublic(row, await getRequestLocale()));
   } catch {
     return [];
   }

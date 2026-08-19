@@ -1,4 +1,4 @@
-import Link from "next/link";
+import LocaleLink from "@/components/i18n/LocaleLink";
 import { ArrowUpRight } from "@phosphor-icons/react/ssr";
 
 type Variant = "primary" | "secondary" | "gold" | "ghost" | "dark";
@@ -45,9 +45,9 @@ export function Button(props: LinkBtn | ActionBtn) {
 
   if ("href" in props && props.href) {
     return (
-      <Link href={props.href} className={cls}>
+      <LocaleLink href={props.href} className={cls}>
         {content}
-      </Link>
+      </LocaleLink>
     );
   }
 

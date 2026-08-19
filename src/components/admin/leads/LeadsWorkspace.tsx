@@ -21,6 +21,7 @@ export type LeadRow = {
   createdAt: string;
   product: { name: string; slug: string; category: "TRACTOR" | "EQUIPMENT" } | null;
   usedTractor: { id: string; brand: string; model: string; slug: string } | null;
+  locale?: string;
 };
 
 const STATUS: { value: LeadStatus; label: string }[] = [
@@ -225,6 +226,11 @@ export default function LeadsWorkspace({
             <p className="text-xs uppercase tracking-wide text-[var(--admin-muted)]">Teklif detayı</p>
             <h2 className="mt-1 font-display text-2xl">{open.name}</h2>
             <p className="mt-1 text-xs text-[var(--admin-muted)]">{relativeTimeTr(open.createdAt)}</p>
+            {open.locale ? (
+              <p className="mt-2 text-sm text-[var(--admin-text-2)]">
+                Dil: {open.locale === "tr" ? "Türkçe" : open.locale === "en" ? "English" : "Shqip"}
+              </p>
+            ) : null}
             <dl className="mt-4 space-y-3 text-sm">
               <div>
                 <dt className="text-[var(--admin-muted)]">Telefon</dt>

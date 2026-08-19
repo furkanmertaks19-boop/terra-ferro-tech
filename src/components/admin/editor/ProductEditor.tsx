@@ -20,6 +20,10 @@ import { resolveHeroImageMode, editorCinematicImageMode, type HeroImageMode } fr
 import { BADGE_TONES, TONE_LABELS, resolveBadgeTone, type BadgeTone } from "@/lib/badges";
 import type { AdminProduct } from "@/lib/types";
 import { useToast } from "../ui/Toast";
+import LocaleTabs, { missingHint } from "../ui/LocaleTabs";
+import { parseI18nBag, type Locale } from "@/lib/i18n/config";
+import { localeHasCopy } from "@/lib/i18n/config";
+import { str } from "@/lib/i18n/content";
 import RichTextEditor from "./RichTextEditor";
 import MediaGallery from "./MediaGallery";
 import SpecBuilder from "./SpecBuilder";
@@ -72,6 +76,7 @@ type State = {
   heroImageMode: HeroImageMode;
   hasUnpublishedChanges: boolean;
   referenceUrl: string;
+  i18n: Record<string, Record<string, unknown>>;
 };
 
 function fromProduct(initial?: AdminProduct, presetCategory?: Category): State {
@@ -112,6 +117,7 @@ function fromProduct(initial?: AdminProduct, presetCategory?: Category): State {
     heroImageMode: resolveHeroImageMode(initial?.heroImageMode),
     hasUnpublishedChanges: initial?.hasUnpublishedChanges ?? false,
     referenceUrl: initial?.referenceUrl ?? "",
+    i18n: (initial as { i18n?: Record<string, Record<string, unknown>> } | undefined)?.i18n ?? {},
   };
 }
 
@@ -200,6 +206,7 @@ export default function ProductEditor({
       showTechnicalPdf: s.showTechnicalPdf,
       heroImageMode: s.heroImageMode,
       referenceUrl: s.referenceUrl || null,
+      i18n: s.i18n ?? {},
     };
   }, []);
 
@@ -311,6 +318,7 @@ export default function ProductEditor({
   const [moreCopy, setMoreCopy] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
   const [quick, setQuick] = useState(!initial);
+  const [editLocale, setEditLocale] = useState<Locale>("sq");
 
   const busy = saving || publishing;
   const publicHref = (state.status === ProductStatus.PUBLISHED ? publicSlug || state.slug : state.slug)
@@ -450,9 +458,44 @@ export default function ProductEditor({
                 <p className="mt-2 font-semibold">Tarım Makinesi</p>
               </button>
             </div>
+            <div className="mt-4 space-y-2">
+              <LocaleTabs
+                value={editLocale}
+                onChange={setEditLocale}
+                missing={{
+                  en: !localeHasCopy(state.i18n, "en", ["name", "fullTitle", "shortDescription"]),
+                  tr: !localeHasCopy(state.i18n, "tr", ["name", "fullTitle", "shortDescription"]),
+                }}
+              />
+              {missingHint(editLocale) ? <p className="text-xs text-amber-300">{missingHint(editLocale)}</p> : null}
+            </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Field id="name" label="Ürün Adı" error={errors.name} value={state.name} onChange={setName} />
-              <Field id="series" label="Seri" error={errors.series} value={state.series} onChange={(v) => patch({ series: v })} />
+              <Field
+                id="name"
+                label="Ürün Adı"
+                error={errors.name}
+                value={editLocale === "sq" ? state.name : str(parseI18nBag(state.i18n)[editLocale]?.name)}
+                onChange={(v) => {
+                  if (editLocale === "sq") setName(v);
+                  else {
+                    const bag = parseI18nBag(state.i18n);
+                    patch({ i18n: { ...bag, [editLocale]: { ...(bag[editLocale] ?? {}), name: v } } });
+                  }
+                }}
+              />
+              <Field
+                id="series"
+                label="Seri görünen adı"
+                error={errors.series}
+                value={editLocale === "sq" ? state.series : str(parseI18nBag(state.i18n)[editLocale]?.series)}
+                onChange={(v) => {
+                  if (editLocale === "sq") patch({ series: v });
+                  else {
+                    const bag = parseI18nBag(state.i18n);
+                    patch({ i18n: { ...bag, [editLocale]: { ...(bag[editLocale] ?? {}), series: v } } });
+                  }
+                }}
+              />
               <div className="sm:col-span-2">
                 <p className="admin-label">Alt Kategori</p>
                 <div className="mt-2 flex flex-wrap gap-2">

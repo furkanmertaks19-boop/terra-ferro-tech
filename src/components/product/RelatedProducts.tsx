@@ -1,10 +1,14 @@
+"use client";
+
 import TractorCard from "./TractorCard";
 import EquipmentCard from "./EquipmentCard";
 import { Category } from "@prisma/client";
 import type { PublicProduct } from "@/lib/types";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 
-export default function RelatedProducts({ products }: { products: PublicProduct[] }) {
+export default function RelatedProducts({
+  products }: { products: PublicProduct[] }) {
+  const t = useT();
   if (products.length === 0) return null;
 
   return (

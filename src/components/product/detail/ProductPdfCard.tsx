@@ -1,11 +1,15 @@
+"use client";
+
 import { FilePdf } from "@phosphor-icons/react/ssr";
 import type { PublicProduct } from "@/lib/types";
 import { publicPdfUrl } from "@/components/product/TechnicalPdfCta";
-import { t } from "@/lib/i18n";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { productContainer, productSection } from "./product-shell";
 import PdfDownloadButton from "./PdfDownloadButton";
 
-export default function ProductPdfCard({ product }: { product: PublicProduct }) {
+export default function ProductPdfCard({
+  product }: { product: PublicProduct }) {
+  const t = useT();
   const href = publicPdfUrl(product);
   if (!href) return null;
 

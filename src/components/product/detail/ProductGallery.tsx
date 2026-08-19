@@ -1,10 +1,14 @@
+"use client";
+
 import { galleryUrls, type PublicProduct } from "@/lib/types";
-import { t } from "@/lib/i18n";
-import { productImageAlt } from "@/lib/seo";
+import { useT } from "@/components/i18n/LocaleProvider";
+import { productImageAlt } from "@/lib/product-path";
 import ProductMediaGallery from "./ProductMediaGallery";
 import { productContainer, productEyebrow, productSection, productTitle } from "./product-shell";
 
-export default function ProductGallerySection({ product }: { product: PublicProduct }) {
+export default function ProductGallerySection({
+  product }: { product: PublicProduct }) {
+  const t = useT();
   const images = galleryUrls(product);
   if (images.length < 2) return null;
 
