@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { createLead, type LeadFormState } from "@/lib/actions/leads";
 import { useT, useLocale } from "@/components/i18n/LocaleProvider";
+import { pickPublicText } from "@/lib/i18n/content";
 
 const initialState: LeadFormState = { success: false };
 
@@ -28,13 +29,13 @@ export default function ContactForm({
   const locale = useLocale();
   const [state, formAction, pending] = useActionState(createLead, initialState);
   const copy = {
-    formTitle: labels?.formTitle || "Dërgoni një mesazh",
-    submitLabel: labels?.submitLabel || "Dërgo",
-    nameLabel: labels?.nameLabel || "Emri dhe mbiemri",
-    phoneLabel: labels?.phoneLabel || "Telefoni",
-    emailLabel: labels?.emailLabel || "Email",
-    subjectLabel: labels?.subjectLabel || "Subjekti",
-    messageLabel: labels?.messageLabel || "Mesazhi",
+    formTitle: pickPublicText(locale, labels?.formTitle, labels?.formTitle, t.pages.formTitle),
+    submitLabel: pickPublicText(locale, labels?.submitLabel, labels?.submitLabel, t.pages.send),
+    nameLabel: pickPublicText(locale, labels?.nameLabel, labels?.nameLabel, t.quoteForm.name),
+    phoneLabel: pickPublicText(locale, labels?.phoneLabel, labels?.phoneLabel, t.quoteForm.phone),
+    emailLabel: pickPublicText(locale, labels?.emailLabel, labels?.emailLabel, t.quoteForm.email),
+    subjectLabel: pickPublicText(locale, labels?.subjectLabel, labels?.subjectLabel, t.pages.subject),
+    messageLabel: pickPublicText(locale, labels?.messageLabel, labels?.messageLabel, t.quoteForm.message),
   };
 
   if (state.success) {

@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/Button";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
 import type { PublicGalleryItem } from "@/lib/gallery";
-import { useT } from "@/components/i18n/LocaleProvider";
+import { useT, useLocale } from "@/components/i18n/LocaleProvider";
+import { pathFor } from "@/lib/i18n/routing";
 
 export default function GalleryPreviewSection({
   section,
@@ -18,11 +19,12 @@ export default function GalleryPreviewSection({
   items: PublicGalleryItem[];
 }) {
   const t = useT();
+  const locale = useLocale();
   if (!items.length) return null;
   const title = section.title || t.home.galleryHeadline;
   const body = section.body || t.home.galleryBody;
   const ctaLabel = section.ctaLabel || t.home.galleryCta;
-  const ctaHref = section.ctaHref || "/galeri";
+  const ctaHref = section.ctaHref || pathFor("gallery", locale);
   const eyebrow = section.eyebrow || t.nav.gallery;
 
   return (
@@ -40,10 +42,10 @@ export default function GalleryPreviewSection({
               key={item.id}
               className={index === 0 ? "col-span-12 min-h-[280px] md:col-span-7 md:min-h-[340px]" : "col-span-6 min-h-[160px] md:col-span-5 md:min-h-[220px]"}
             >
-              <Link href="/galeri" className="relative block h-full min-h-[160px] overflow-hidden bg-[#d9d3c6] md:min-h-[220px]">
+              <Link href={ctaHref} className="relative block h-full min-h-[160px] overflow-hidden bg-[#d9d3c6] md:min-h-[220px]">
                 <Image
                   src={item.thumbnailUrl}
-                  alt={item.altText || item.title || "Galeri"}
+                  alt={item.altText || item.title || t.nav.gallery}
                   fill
                   loading="lazy"
                   className="object-cover"

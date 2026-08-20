@@ -44,7 +44,7 @@ function SwitcherInner({ inverted = false }: { inverted?: boolean }) {
               onClick={(event) => {
                 if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
                 event.preventDefault();
-                router.push(href);
+                router.replace(href);
                 router.refresh();
               }}
             >

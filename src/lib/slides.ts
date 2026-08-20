@@ -4,9 +4,9 @@ import type { HomeSlide } from "@prisma/client";
 import type { AdminSlide } from "./slide-types";
 import { getRequestLocale } from "@/lib/i18n/request";
 import { parseI18nBag } from "@/lib/i18n/config";
-import { str } from "@/lib/i18n/content";
+import { pickPublicText, str } from "@/lib/i18n/content";
 import { localizeHref } from "@/lib/i18n/routing";
-import { localizeKnownUi } from "@/lib/i18n/phrases";
+import { homeSlideDefaults } from "@/lib/i18n/page-defaults";
 
 export type { AdminSlide } from "./slide-types";
 
@@ -60,18 +60,24 @@ export async function getActiveHomeSlides(): Promise<PublicHeroSlide[]> {
     .filter((row) => row.desktopImage)
     .map((row) => {
       const copy = locale === "sq" ? {} : parseI18nBag(row.i18n)[locale] ?? {};
+      const defaults = homeSlideDefaults(row.id, locale);
       const primaryUrl = str(copy.primaryButtonUrl, row.primaryButtonUrl);
       const secondaryUrl = str(copy.secondaryButtonUrl, row.secondaryButtonUrl);
       return {
         id: row.id,
-        eyebrow: localizeKnownUi(str(copy.eyebrow, row.eyebrow), locale),
-        title: localizeKnownUi(str(copy.title, row.title), locale),
-        subtitle: localizeKnownUi(str(copy.subtitle, row.subtitle), locale),
+        eyebrow: pickPublicText(locale, copy.eyebrow, row.eyebrow, defaults.eyebrow),
+        title: pickPublicText(locale, copy.title, row.title, defaults.title),
+        subtitle: pickPublicText(locale, copy.subtitle, row.subtitle, defaults.subtitle),
         desktopImage: row.desktopImage,
         mobileImage: row.mobileImage,
-        primaryButtonText: localizeKnownUi(str(copy.primaryButtonText, row.primaryButtonText), locale),
+        primaryButtonText: pickPublicText(locale, copy.primaryButtonText, row.primaryButtonText, defaults.primaryButtonText),
         primaryButtonUrl: !primaryUrl || primaryUrl.startsWith("#") ? primaryUrl : localizeHref(primaryUrl, locale),
-        secondaryButtonText: localizeKnownUi(str(copy.secondaryButtonText, row.secondaryButtonText), locale),
+        secondaryButtonText: pickPublicText(
+          locale,
+          copy.secondaryButtonText,
+          row.secondaryButtonText,
+          defaults.secondaryButtonText,
+        ),
         secondaryButtonUrl: !secondaryUrl || secondaryUrl.startsWith("#") ? secondaryUrl : localizeHref(secondaryUrl, locale),
         contentPosition: isSlidePosition(row.contentPosition) ? row.contentPosition : "left-center",
         overlayOpacity: Math.min(85, Math.max(0, row.overlayOpacity)),

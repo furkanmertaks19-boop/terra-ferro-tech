@@ -40,7 +40,7 @@ export default function UsedTractorDetail({ item }: { item: PublicUsedTractor })
     { label: t.productDetail.cabin, value: item.hasCabin ? t.productDetail.cabin : t.productDetail.rops },
     { label: t.usedPage.fuel, value: item.fuelType },
     { label: t.spec.transmission, value: item.transmission },
-    { label: "Vendndodhja", value: item.location },
+    { label: t.usedPage.location, value: item.location },
   ].filter((row): row is { label: string; value: string } => Boolean(row.value));
 
   return (
@@ -48,9 +48,9 @@ export default function UsedTractorDetail({ item }: { item: PublicUsedTractor })
 
       <section className="border-b border-ink/[0.08] bg-ivory pt-24 pb-10 md:pt-28 md:pb-14">
         <div className={`${productContainer} grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] lg:gap-12`}>
-          <ProductMediaGallery images={images} alt={`${label} i përdorur`} heroImageMode="COVER" layout="hero" />
+          <ProductMediaGallery images={images} alt={`${label} ${t.usedPage.usedEyebrow}`} heroImageMode="COVER" layout="hero" />
           <div className="flex flex-col">
-            <p className={productEyebrow}>Traktor i përdorur</p>
+            <p className={productEyebrow}>{t.usedPage.usedEyebrow}</p>
             {badge ? (
               <p className="mt-3 inline-flex w-fit bg-ink px-2.5 py-1 text-[11px] font-semibold tracking-[0.14em] uppercase text-white">
                 {badge}
@@ -127,7 +127,7 @@ export default function UsedTractorDetail({ item }: { item: PublicUsedTractor })
               {t.productDetail.galleryTitle}
             </h2>
             <div className="mt-8">
-              <ProductMediaGallery images={images} alt={`${label} i përdorur`} heroImageMode="COVER" layout="section" />
+              <ProductMediaGallery images={images} alt={`${label} ${t.usedPage.usedEyebrow}`} heroImageMode="COVER" layout="section" />
             </div>
           </div>
         </section>

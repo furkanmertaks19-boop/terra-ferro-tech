@@ -156,6 +156,7 @@ function FilterOption({
 }
 
 function MobileFilters({ children }: { children: React.ReactNode }) {
+  const t = useT();
   const params = useSearchParams();
   const open = params.get("filters") === "1";
   const router = useRouter();
@@ -178,12 +179,12 @@ function MobileFilters({ children }: { children: React.ReactNode }) {
 
   return open ? (
     <div className="fixed inset-0 z-[55] flex flex-col justify-end bg-ink/50 lg:hidden">
-      <button type="button" className="absolute inset-0" aria-label="Mbyll" onClick={() => toggle(false)} />
+      <button type="button" className="absolute inset-0" aria-label={t.common.close} onClick={() => toggle(false)} />
       <div className="relative max-h-[85dvh] overflow-y-auto bg-warm p-5">
         <div className="mb-4 flex items-center justify-between">
-          <p className="font-display text-lg font-semibold">Filtro</p>
+          <p className="font-display text-lg font-semibold">{t.productList.filters}</p>
           <button type="button" onClick={() => toggle(false)} className="text-sm">
-            Mbyll
+            {t.common.close}
           </button>
         </div>
         {children}

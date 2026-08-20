@@ -6,14 +6,17 @@ import { parseContactConfig, type PublicPageContent } from "@/lib/page-cms";
 import type { PublicSiteSettings } from "@/lib/site-settings";
 import { SITE_NAME, organizationJsonLd } from "@/lib/seo";
 import { EnvelopeSimple, MapPin, Phone } from "@phosphor-icons/react/ssr";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getRequestLocale } from "@/lib/i18n/request";
 
-export default function ContactView({
+export default async function ContactView({
   page,
   settings,
 }: {
   page: PublicPageContent;
   settings: PublicSiteSettings;
 }) {
+  const t = getDictionary(await getRequestLocale());
   const config = parseContactConfig(page.config);
 
   return (
@@ -25,16 +28,14 @@ export default function ContactView({
           <h2 id="contact-details" className="font-display text-3xl font-semibold tracking-tight">
             {SITE_NAME}
           </h2>
-          <p className="mt-3 max-w-md text-base leading-relaxed text-ink/60">
-            Na shkruani ose na telefononi. Ekipi ynë në Lushnje ju kthen përgjigje sa më shpejt për traktorë, makineri dhe pjesë këmbimi.
-          </p>
+          <p className="mt-3 max-w-md text-base leading-relaxed text-ink/60">{t.pages.contactIntro}</p>
           <ul className="mt-8 space-y-5">
             <li className="flex gap-4">
               <span className="mt-0.5 grid h-11 w-11 shrink-0 place-items-center border border-ink/10 bg-white text-tractor-red">
                 <EnvelopeSimple size={18} />
               </span>
               <div>
-                <p className="text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/40">Email</p>
+                <p className="text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/40">{t.quoteForm.email}</p>
                 <a href={`mailto:${settings.email}`} className="mt-1 block text-base text-ink hover:text-tractor-red">
                   {settings.email}
                 </a>
@@ -45,7 +46,7 @@ export default function ContactView({
                 <Phone size={18} />
               </span>
               <div>
-                <p className="text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/40">Telefon</p>
+                <p className="text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/40">{t.pages.phoneLabel}</p>
                 <a href={`tel:${settings.phoneHref}`} className="mt-1 block text-base text-ink hover:text-tractor-red">
                   {settings.phone}
                 </a>
@@ -56,7 +57,7 @@ export default function ContactView({
                 <MapPin size={18} />
               </span>
               <div>
-                <p className="text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/40">Vendndodhja</p>
+                <p className="text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/40">{t.pages.location}</p>
                 <p className="mt-1 text-base text-ink">{settings.location}</p>
               </div>
             </li>
@@ -66,7 +67,7 @@ export default function ContactView({
           <ContactForm labels={config} />
         </Reveal>
       </section>
-      <section className="container-site pb-14 md:pb-16" aria-label="Harta">
+      <section className="container-site pb-14 md:pb-16" aria-label={t.pages.mapLabel}>
         <div className="overflow-hidden border border-ink/10 bg-white">
           <iframe
             src={settings.mapEmbedUrl}
@@ -76,7 +77,7 @@ export default function ContactView({
             allowFullScreen
             loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"
-            title="Terra Ferro Tech - Lushnje, Albania"
+            title={`${SITE_NAME} - Lushnje, Albania`}
             className="block h-[280px] w-full max-w-full md:h-[420px] lg:h-[460px]"
           />
         </div>

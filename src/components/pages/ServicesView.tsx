@@ -7,11 +7,35 @@ import { parseServicesConfig, type PublicPageContent } from "@/lib/page-cms";
 
 function serviceIcon(title: string): Icon {
   const value = title.toLowerCase();
-  if (value.includes("konsulen") || value.includes("zgjedh")) return Compass;
-  if (value.includes("shitje")) return Handshake;
-  if (value.includes("pjes") || value.includes("këmbim") || value.includes("kembim")) return Wrench;
-  if (value.includes("mbështet") || value.includes("mbeshtet") || value.includes("teknik")) return Headphones;
-  if (value.includes("servis")) return GearSix;
+  if (
+    value.includes("konsulen") ||
+    value.includes("zgjedh") ||
+    value.includes("advice") ||
+    value.includes("selection") ||
+    value.includes("danışman") ||
+    value.includes("seçim")
+  )
+    return Compass;
+  if (value.includes("shitje") || value.includes("sales") || value.includes("satış")) return Handshake;
+  if (
+    value.includes("pjes") ||
+    value.includes("këmbim") ||
+    value.includes("kembim") ||
+    value.includes("spare") ||
+    value.includes("parts") ||
+    value.includes("yedek") ||
+    value.includes("parça")
+  )
+    return Wrench;
+  if (
+    value.includes("mbështet") ||
+    value.includes("mbeshtet") ||
+    value.includes("teknik") ||
+    value.includes("support") ||
+    value.includes("destek")
+  )
+    return Headphones;
+  if (value.includes("servis") || value.includes("service")) return GearSix;
   return GearSix;
 }
 

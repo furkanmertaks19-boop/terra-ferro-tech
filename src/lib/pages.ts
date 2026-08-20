@@ -102,10 +102,13 @@ export async function getPublishedPage(key: PageKey): Promise<PublicPageContent>
   const fallback = defaultRevision(key);
   try {
     const row = await withPrismaRetry(() => prisma.pageContent.findUnique({ where: { pageKey: key } }));
-    const revision = localizePageRevision(row ? rowToRevision(key, row) : fallback, await getRequestLocale());
+    const locale = await getRequestLocale();
+    const revision = localizePageRevision(row ? rowToRevision(key, row) : fallback, locale, key);
     return { pageKey: key, ...revisionToHero(revision), config: revision.config };
   } catch {
-    return { pageKey: key, ...revisionToHero(fallback), config: fallback.config };
+    const locale = await getRequestLocale().catch(() => "sq" as const);
+    const revision = localizePageRevision(fallback, locale, key);
+    return { pageKey: key, ...revisionToHero(revision), config: revision.config };
   }
 }
 

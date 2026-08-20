@@ -2,15 +2,17 @@ import { prisma, withPrismaRetry } from "@/lib/prisma";
 import {
   isHomeSectionType,
   parseHomeConfig,
+  type HomeSectionConfig,
+  type HomeSectionFeature,
   type HomeSectionRecord,
   type HomeSectionType,
 } from "@/lib/home-section-types";
 import { ABOUT } from "@/lib/site-content";
 import { getRequestLocale } from "@/lib/i18n/request";
 import { parseI18nBag } from "@/lib/i18n/config";
-import { str } from "@/lib/i18n/content";
+import { pickPublicText } from "@/lib/i18n/content";
 import { localizeHref } from "@/lib/i18n/routing";
-import { localizeKnownUi } from "@/lib/i18n/phrases";
+import { aboutFeatureDefault, homeSectionFieldDefault } from "@/lib/i18n/page-defaults";
 
 const FALLBACK: HomeSectionRecord[] = [
   {
@@ -146,23 +148,52 @@ function mapSection(row: {
 }, locale: "sq" | "en" | "tr", forAdmin = false): HomeSectionRecord | null {
   if (!isHomeSectionType(row.type)) return null;
   const copy = locale === "sq" || forAdmin ? {} : parseI18nBag(row.i18n)[locale] ?? {};
+  const configOverlay =
+    copy.config && typeof copy.config === "object" ? (copy.config as { features?: unknown }) : {};
   return {
     id: row.id,
     type: row.type,
     variant: row.variant,
-    title: localizeKnownUi(str(copy.title, row.title), locale),
-    eyebrow: localizeKnownUi(str(copy.eyebrow, row.eyebrow), locale),
-    body: localizeKnownUi(str(copy.body, row.body), locale),
+    title: forAdmin
+      ? row.title
+      : pickPublicText(locale, copy.title, row.title, homeSectionFieldDefault(row.type, "title", locale)),
+    eyebrow: forAdmin
+      ? row.eyebrow
+      : pickPublicText(locale, copy.eyebrow, row.eyebrow, homeSectionFieldDefault(row.type, "eyebrow", locale)),
+    body: forAdmin
+      ? row.body
+      : pickPublicText(locale, copy.body, row.body, homeSectionFieldDefault(row.type, "body", locale)),
     image: row.image,
     mobileImage: row.mobileImage,
-    ctaLabel: localizeKnownUi(str(copy.ctaLabel, row.ctaLabel), locale),
+    ctaLabel: forAdmin
+      ? row.ctaLabel
+      : pickPublicText(locale, copy.ctaLabel, row.ctaLabel, homeSectionFieldDefault(row.type, "ctaLabel", locale)),
     ctaHref: forAdmin ? row.ctaHref : localizeHref(row.ctaHref || "/", locale),
-    config: parseHomeConfig(row.config),
+    config: localizeHomeConfig(parseHomeConfig(row.config), locale, configOverlay.features, forAdmin),
     sortOrder: row.sortOrder,
     isVisible: row.isVisible,
     updatedAt: row.updatedAt.toISOString(),
     i18n: row.i18n,
   };
+}
+
+function localizeHomeConfig(
+  config: HomeSectionConfig,
+  locale: "sq" | "en" | "tr",
+  overlayFeatures: unknown,
+  forAdmin: boolean,
+): HomeSectionConfig {
+  if (forAdmin || !Array.isArray(config.features)) return config;
+  const overlay = Array.isArray(overlayFeatures) ? overlayFeatures : [];
+  const features: HomeSectionFeature[] = config.features.map((item, index) => {
+    const row = overlay[index] && typeof overlay[index] === "object" ? (overlay[index] as Record<string, unknown>) : {};
+    const dict = aboutFeatureDefault(locale, index);
+    return {
+      title: pickPublicText(locale, row.title, item.title, dict.title),
+      body: pickPublicText(locale, row.body, item.body, dict.body),
+    };
+  });
+  return { ...config, features };
 }
 
 export async function getHomeSections(includeHidden = false): Promise<HomeSectionRecord[]> {
@@ -178,16 +209,25 @@ export async function getHomeSections(includeHidden = false): Promise<HomeSectio
       const fallback = includeHidden ? FALLBACK : FALLBACK.filter((row) => row.isVisible);
       return fallback.map((row) => ({
         ...row,
-        title: localizeKnownUi(row.title, locale),
-        eyebrow: localizeKnownUi(row.eyebrow, locale),
-        body: localizeKnownUi(row.body, locale),
-        ctaLabel: localizeKnownUi(row.ctaLabel, locale),
+        title: pickPublicText(locale, undefined, row.title, homeSectionFieldDefault(row.type, "title", locale)),
+        eyebrow: pickPublicText(locale, undefined, row.eyebrow, homeSectionFieldDefault(row.type, "eyebrow", locale)),
+        body: pickPublicText(locale, undefined, row.body, homeSectionFieldDefault(row.type, "body", locale)),
+        ctaLabel: pickPublicText(locale, undefined, row.ctaLabel, homeSectionFieldDefault(row.type, "ctaLabel", locale)),
         ctaHref: includeHidden ? row.ctaHref : localizeHref(row.ctaHref || "/", locale),
+        config: localizeHomeConfig(row.config, locale, undefined, includeHidden),
       }));
     }
     return includeHidden ? mapped : mapped.filter((row) => row.isVisible);
   } catch {
-    return includeHidden ? FALLBACK : FALLBACK.filter((row) => row.isVisible);
+    return includeHidden ? FALLBACK : FALLBACK.filter((row) => row.isVisible).map((row) => ({
+      ...row,
+      title: pickPublicText(locale, undefined, row.title, homeSectionFieldDefault(row.type, "title", locale)),
+      eyebrow: pickPublicText(locale, undefined, row.eyebrow, homeSectionFieldDefault(row.type, "eyebrow", locale)),
+      body: pickPublicText(locale, undefined, row.body, homeSectionFieldDefault(row.type, "body", locale)),
+      ctaLabel: pickPublicText(locale, undefined, row.ctaLabel, homeSectionFieldDefault(row.type, "ctaLabel", locale)),
+      ctaHref: localizeHref(row.ctaHref || "/", locale),
+      config: localizeHomeConfig(row.config, locale, undefined, false),
+    }));
   }
 }
 

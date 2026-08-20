@@ -1,4 +1,27 @@
 import { CONTENT_LOCALES, localeHasCopy, parseI18nBag, pickLocalizedString, textValue, type ContentLocale, type I18nBag, type Locale } from "./config";
+import { foldUi, localizeKnownUi } from "./phrases";
+
+export function looksAlbanian(text: string): boolean {
+  const raw = text.trim();
+  if (!raw) return false;
+  if (/[ëË]/.test(raw)) return true;
+  const folded = foldUi(raw);
+  return /\b(dhe|juaj|makineri|traktore|traktoret|sherbimet|sherbim|gjej|shiko|rreth nesh|cfare|dergoni|vendndodhja|bujqesore|bujqesor|pemishte|kembimi|kembim|mbeshtetje|ofrojme|ofrojme|prane|ne shqiperi|lushnje|kerkoni|kerko|na shkruani|ekipi yne|foto dhe|gama e produkteve|modelet e zgjedhura|kultivatore|rotovatore|plugje|fuqia qe|pajisjet qe|partneri juaj)\b/.test(
+    folded,
+  );
+}
+
+/** SQ stays in DB; EN/TR prefer bag, then known UI map, then dictionary — never leftover Albanian UI. */
+export function pickPublicText(locale: Locale, bag: unknown, db: unknown, dict = ""): string {
+  const fromDb = str(db);
+  if (locale === "sq") return fromDb || dict;
+  const fromBag = str(bag);
+  if (fromBag && !looksAlbanian(fromBag)) return fromBag;
+  const mapped = localizeKnownUi(fromBag || fromDb, locale);
+  if (mapped && !looksAlbanian(mapped)) return mapped;
+  if (dict) return dict;
+  return fromBag || fromDb;
+}
 
 export function str(value: unknown, fallback = "") {
   const next = textValue(value).trim();

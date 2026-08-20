@@ -3,8 +3,15 @@ import { uid } from "@/lib/admin-content";
 import { parseI18nBag, type I18nBag } from "@/lib/i18n/config";
 import type { Locale } from "@/lib/i18n/config";
 import { localizeHref } from "@/lib/i18n/routing";
-import { str } from "@/lib/i18n/content";
-import { localizeKnownUi } from "@/lib/i18n/phrases";
+import { pickPublicText, str } from "@/lib/i18n/content";
+import {
+  aboutFeatureDefault,
+  aboutUiDefaults,
+  contactUiDefaults,
+  pageHeroDefaults,
+  serviceItemDefault,
+  servicesUiDefaults,
+} from "@/lib/i18n/page-defaults";
 
 export const PAGE_KEYS = ["about", "tractors", "equipment", "gallery", "services", "contact"] as const;
 export type PageKey = (typeof PAGE_KEYS)[number];
@@ -418,38 +425,61 @@ export function revisionToHero(revision: PageRevision): PublicPageHero {
 }
 
 export function toPublicPage(key: PageKey, revision: PageRevision, locale: Locale = "sq"): PublicPageContent {
-  return { pageKey: key, ...revisionToHero(localizePageRevision(revision, locale)), config: localizePageRevision(revision, locale).config };
+  const localized = localizePageRevision(revision, locale, key);
+  return { pageKey: key, ...revisionToHero(localized), config: localized.config };
 }
 
-function localizeConfig(config: PageConfig, locale: Locale, overlay: unknown): PageConfig {
+function localizeConfig(config: PageConfig, locale: Locale, overlay: unknown, key: PageKey): PageConfig {
   if (!config || typeof config !== "object") return config;
   const extra = overlay && typeof overlay === "object" ? (overlay as Record<string, unknown>) : {};
   const next = { ...config } as Record<string, unknown>;
-  for (const key of Object.keys(next)) {
-    if (typeof next[key] === "string" && key !== "ctaHref" && key !== "introImage") {
-      next[key] = localizeKnownUi(str(extra[key], next[key] as string), locale);
+  const aboutDict = aboutUiDefaults(locale);
+  const contactDict = contactUiDefaults(locale);
+  const servicesDict = servicesUiDefaults(locale);
+  const stringDefaults: Record<string, string> = {
+    introTitle: aboutDict.introTitle,
+    introBody: aboutDict.introBody,
+    ctaTitle: aboutDict.ctaTitle,
+    ctaLabel: key === "services" ? servicesDict.ctaLabel : aboutDict.ctaLabel,
+    formTitle: contactDict.formTitle,
+    submitLabel: contactDict.submitLabel,
+    nameLabel: contactDict.nameLabel,
+    phoneLabel: contactDict.phoneLabel,
+    emailLabel: contactDict.emailLabel,
+    subjectLabel: contactDict.subjectLabel,
+    messageLabel: contactDict.messageLabel,
+  };
+  for (const field of Object.keys(next)) {
+    if (typeof next[field] === "string" && field !== "ctaHref" && field !== "introImage") {
+      next[field] = pickPublicText(locale, extra[field], next[field], stringDefaults[field] ?? "");
     }
   }
-  if (Array.isArray((config as AboutConfig).features) && Array.isArray(extra.features)) {
+  if (Array.isArray((config as AboutConfig).features)) {
     next.features = mergeFeatureCopy((config as AboutConfig).features, extra.features);
   }
-  if (Array.isArray((config as ServicesConfig).items) && Array.isArray(extra.items)) {
+  if (Array.isArray((config as ServicesConfig).items)) {
     next.items = mergeFeatureCopy((config as ServicesConfig).items, extra.items);
   }
   if (typeof next.ctaHref === "string") next.ctaHref = localizeHref(next.ctaHref, locale);
   if (Array.isArray(next.features)) {
-    next.features = (next.features as PageFeatureItem[]).map((item) => ({
-      ...item,
-      title: localizeKnownUi(item.title, locale),
-      body: localizeKnownUi(item.body, locale),
-    }));
+    next.features = (next.features as PageFeatureItem[]).map((item, index) => {
+      const dict = aboutFeatureDefault(locale, index);
+      return {
+        ...item,
+        title: pickPublicText(locale, undefined, item.title, dict.title),
+        body: pickPublicText(locale, undefined, item.body, dict.body),
+      };
+    });
   }
   if (Array.isArray(next.items)) {
-    next.items = (next.items as PageFeatureItem[]).map((item) => ({
-      ...item,
-      title: localizeKnownUi(item.title, locale),
-      body: localizeKnownUi(item.body, locale),
-    }));
+    next.items = (next.items as PageFeatureItem[]).map((item, index) => {
+      const dict = serviceItemDefault(locale, index);
+      return {
+        ...item,
+        title: pickPublicText(locale, undefined, item.title, dict.title),
+        body: pickPublicText(locale, undefined, item.body, dict.body),
+      };
+    });
   }
   return next as PageConfig;
 }
@@ -471,14 +501,15 @@ function mergeFeatureCopy(base: PageFeatureItem[], overlay: unknown): PageFeatur
   });
 }
 
-export function localizePageRevision(revision: PageRevision, locale: Locale): PageRevision {
+export function localizePageRevision(revision: PageRevision, locale: Locale, key: PageKey): PageRevision {
   const copy = locale === "sq" ? {} : parseI18nBag(revision.i18n)[locale] ?? {};
+  const defaults = pageHeroDefaults(key, locale);
   return {
     ...revision,
-    eyebrow: localizeKnownUi(str(copy.eyebrow, revision.eyebrow), locale),
-    title: localizeKnownUi(str(copy.title, revision.title), locale),
-    description: localizeKnownUi(str(copy.description, revision.description), locale),
-    config: localizeConfig(revision.config, locale, copy.config),
+    eyebrow: pickPublicText(locale, copy.eyebrow, revision.eyebrow, defaults.eyebrow),
+    title: pickPublicText(locale, copy.title, revision.title, defaults.title),
+    description: pickPublicText(locale, copy.description, revision.description, defaults.description),
+    config: localizeConfig(revision.config, locale, copy.config, key),
   };
 }
 
