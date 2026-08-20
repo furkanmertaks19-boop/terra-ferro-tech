@@ -1,16 +1,17 @@
+"use client";
+
 import { UsedTractorDrive, UsedTractorStatus } from "@prisma/client";
 import { FilePdf } from "@phosphor-icons/react/ssr";
 import ProductMediaGallery from "@/components/product/detail/ProductMediaGallery";
 import QuoteButton from "@/components/product/QuoteButton";
 import QuoteForm from "@/components/product/QuoteForm";
-import JsonLd from "@/components/seo/JsonLd";
 import {
   usedTractorGallery,
   usedTractorLabel,
-  type PublicUsedTractor,
-} from "@/lib/used-tractors";
-import { usedTractorBreadcrumbJsonLd, usedTractorJsonLd } from "@/lib/seo";
+} from "@/lib/used-tractor-path";
+import type { PublicUsedTractor } from "@/lib/used-tractors";
 import { productBody, productContainer, productEyebrow, productSection, productTitle } from "@/components/product/detail/product-shell";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 function driveLabel(drive: UsedTractorDrive | null) {
   if (drive === UsedTractorDrive.FOUR_WD) return "4x4";
@@ -18,33 +19,32 @@ function driveLabel(drive: UsedTractorDrive | null) {
   return null;
 }
 
-function statusBadge(status: UsedTractorStatus) {
-  if (status === UsedTractorStatus.SOLD) return "E SHITUR";
-  if (status === UsedTractorStatus.RESERVED) return "E REZERVUAR";
+function statusBadge(status: UsedTractorStatus, sold: string, reserved: string) {
+  if (status === UsedTractorStatus.SOLD) return sold;
+  if (status === UsedTractorStatus.RESERVED) return reserved;
   return null;
 }
 
 export default function UsedTractorDetail({ item }: { item: PublicUsedTractor }) {
+  const t = useT();
   const label = usedTractorLabel(item);
   const images = usedTractorGallery(item);
-  const badge = statusBadge(item.status);
+  const badge = statusBadge(item.status, t.used.sold, t.used.reserved);
   const sold = item.status === UsedTractorStatus.SOLD;
   const specs = Object.entries(item.specs);
   const facts = [
-    { label: "Viti", value: item.year ? String(item.year) : null },
-    { label: "Orë pune", value: item.hours != null ? item.hours.toLocaleString("sq-AL") : null },
-    { label: "Fuqia", value: item.horsePower != null ? `${item.horsePower} HP` : null },
-    { label: "Tërheqja", value: driveLabel(item.drive) },
-    { label: "Kabinë", value: item.hasCabin ? "Kabinë" : "ROPS" },
-    { label: "Karburanti", value: item.fuelType },
-    { label: "Transmisioni", value: item.transmission },
+    { label: t.usedPage.year, value: item.year ? String(item.year) : null },
+    { label: t.usedPage.hours, value: item.hours != null ? item.hours.toLocaleString("sq-AL") : null },
+    { label: t.spec.power, value: item.horsePower != null ? `${item.horsePower} HP` : null },
+    { label: t.spec.axle, value: driveLabel(item.drive) },
+    { label: t.productDetail.cabin, value: item.hasCabin ? t.productDetail.cabin : t.productDetail.rops },
+    { label: t.usedPage.fuel, value: item.fuelType },
+    { label: t.spec.transmission, value: item.transmission },
     { label: "Vendndodhja", value: item.location },
   ].filter((row): row is { label: string; value: string } => Boolean(row.value));
 
   return (
     <>
-      <JsonLd data={usedTractorJsonLd(item)} />
-      <JsonLd data={usedTractorBreadcrumbJsonLd(item)} />
 
       <section className="border-b border-ink/[0.08] bg-ivory pt-24 pb-10 md:pt-28 md:pb-14">
         <div className={`${productContainer} grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] lg:gap-12`}>
@@ -122,9 +122,9 @@ export default function UsedTractorDetail({ item }: { item: PublicUsedTractor })
       {images.length > 1 ? (
         <section className={`${productSection} bg-warm-white`} aria-labelledby="used-gallery">
           <div className={productContainer}>
-            <p className={productEyebrow}>Galeria</p>
+            <p className={productEyebrow}>{t.productDetail.galleryTitle}</p>
             <h2 id="used-gallery" className={`mt-3 ${productTitle}`}>
-              Galeria
+              {t.productDetail.galleryTitle}
             </h2>
             <div className="mt-8">
               <ProductMediaGallery images={images} alt={`${label} i përdorur`} heroImageMode="COVER" layout="section" />
@@ -143,9 +143,9 @@ export default function UsedTractorDetail({ item }: { item: PublicUsedTractor })
                 </span>
                 <div>
                   <h2 id="used-pdf" className="font-display text-2xl font-semibold tracking-tight">
-                    Dokumentacion teknik
+                    {t.usedPage.documentation}
                   </h2>
-                  <p className="mt-2 max-w-xl text-sm text-ink/60">Shikoni dokumentin teknik të këtij traktori të përdorur.</p>
+                  <p className="mt-2 max-w-xl text-sm text-ink/60">{t.usedPage.pdfBody}</p>
                 </div>
               </div>
               <a
@@ -154,7 +154,7 @@ export default function UsedTractorDetail({ item }: { item: PublicUsedTractor })
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center bg-tractor-red px-5 py-3 text-[12px] font-semibold tracking-[0.12em] uppercase text-white hover:bg-tractor-red-dark"
               >
-                Shiko PDF-në
+                {t.productDetail.pdfView}
               </a>
             </div>
           </div>
@@ -164,9 +164,9 @@ export default function UsedTractorDetail({ item }: { item: PublicUsedTractor })
       {!sold ? (
         <section className={`${productSection} bg-warm-white`} aria-labelledby="used-quote">
           <div className={productContainer}>
-            <p className={productEyebrow}>Ofertë</p>
+            <p className={productEyebrow}>{t.nav.quote}</p>
             <h2 id="used-quote" className={`mt-3 ${productTitle}`}>
-              Kërko ofertë
+              {t.nav.quote}
             </h2>
             <div className="mt-8 max-w-xl">
               <QuoteForm usedTractorId={item.id} productLabel={label} />

@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/LocaleProvider";
+import { useT, useLocale } from "@/components/i18n/LocaleProvider";
 import type { PublicProduct } from "@/lib/types";
 import { productHref } from "@/lib/product-path";
 
 export default function SearchBox() {
   const t = useT();
+  const locale = useLocale();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PublicProduct[]>([]);
   const [open, setOpen] = useState(false);
@@ -51,7 +52,7 @@ export default function SearchBox() {
           {visibleResults.map((product) => (
             <Link
               key={product.id}
-              href={productHref(product)}
+              href={productHref(product, locale)}
               className="flex items-center justify-between px-4 py-3 text-sm text-brand-black hover:bg-neutral-50"
               onClick={() => setOpen(false)}
             >

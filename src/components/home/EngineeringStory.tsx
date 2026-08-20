@@ -6,7 +6,8 @@ import { SectionIndex } from "@/components/ui/SectionIndex";
 import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
 import { productHref } from "@/lib/product-path";
-import { productImageAlt } from "@/lib/seo";
+import { productImageAlt } from "@/lib/product-path";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
 
 const SPEC_KEYS = [
   { key: "Motori", title: "Motori" },
@@ -15,13 +16,15 @@ const SPEC_KEYS = [
 ] as const;
 
 export default function EngineeringStory({ product }: { product: PublicProduct }) {
+  const t = useT();
+  const locale = useLocale();
   const cover = coverUrl(product);
   const items = [
-    product.horsePower != null ? { title: "Fuqia", body: `${product.horsePower} HP` } : null,
-    ...SPEC_KEYS.map((item) =>
-      product.specs[item.key] ? { title: item.title, body: product.specs[item.key] } : null
-    ),
-    { title: "Kabinë", body: product.hasCabin ? "Kabinë" : "ROPS" },
+    product.horsePower != null ? { title: t.spec.power, body: `${product.horsePower} HP` } : null,
+    product.specs[SPEC_KEYS[0].key] ? { title: t.spec.engine, body: product.specs[SPEC_KEYS[0].key] } : null,
+    product.specs[SPEC_KEYS[1].key] ? { title: t.spec.transmission, body: product.specs[SPEC_KEYS[1].key] } : null,
+    product.specs[SPEC_KEYS[2].key] ? { title: t.spec.hydraulics, body: product.specs[SPEC_KEYS[2].key] } : null,
+    { title: t.productDetail.cabin, body: product.hasCabin ? t.productDetail.cabin : t.productDetail.rops },
   ].filter((item): item is { title: string; body: string } => Boolean(item?.body));
 
   if (items.length < 2) return null;
@@ -46,8 +49,8 @@ export default function EngineeringStory({ product }: { product: PublicProduct }
               ) : null}
             </div>
             <div className="mt-8 hidden lg:block">
-              <Button href={productHref(product)} variant="secondary" arrow>
-                Shiko Modelin
+              <Button href={productHref(product, locale)} variant="secondary" arrow>
+                {t.home.viewModel}
               </Button>
             </div>
           </div>
@@ -70,8 +73,8 @@ export default function EngineeringStory({ product }: { product: PublicProduct }
               </Reveal>
             ))}
             <div className="lg:hidden">
-              <Button href={productHref(product)} variant="secondary" arrow>
-                Shiko Modelin
+              <Button href={productHref(product, locale)} variant="secondary" arrow>
+                {t.home.viewModel}
               </Button>
             </div>
           </div>

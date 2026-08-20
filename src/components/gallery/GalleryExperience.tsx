@@ -7,14 +7,9 @@ import { Play } from "@phosphor-icons/react";
 import type { PublicGalleryCategory, PublicGalleryItem } from "@/lib/gallery";
 import { DURATION, EASE } from "@/lib/motion";
 import GalleryLightbox from "./GalleryLightbox";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 type Filter = "all" | "IMAGE" | "VIDEO";
-
-const FILTERS: { id: Filter; label: string }[] = [
-  { id: "all", label: "Të gjitha" },
-  { id: "IMAGE", label: "Foto" },
-  { id: "VIDEO", label: "Video" },
-];
 
 export default function GalleryExperience({
   items,
@@ -26,6 +21,12 @@ export default function GalleryExperience({
   showFilters?: boolean;
 }) {
   void categories;
+  const t = useT();
+  const filters: { id: Filter; label: string }[] = [
+    { id: "all", label: t.galleryPage.all },
+    { id: "IMAGE", label: t.galleryPage.photos },
+    { id: "VIDEO", label: t.galleryPage.videos },
+  ];
   const reduce = useReducedMotion();
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState<number | null>(null);
@@ -39,7 +40,7 @@ export default function GalleryExperience({
     <div>
       {showFilters ? (
         <div className="flex flex-wrap items-center gap-1.5">
-          {FILTERS.map((f) => (
+          {filters.map((f) => (
             <button
               key={f.id}
               type="button"
@@ -73,7 +74,7 @@ export default function GalleryExperience({
             >
               <Image
                 src={item.thumbnailUrl}
-                alt={item.altText || item.title || "Galeria"}
+                alt={item.altText || item.title || t.nav.gallery}
                 fill
                 loading="lazy"
                 className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"

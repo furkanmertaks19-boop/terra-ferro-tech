@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
@@ -6,19 +8,24 @@ import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { TextReveal } from "@/components/motion/TextReveal";
 import { SectionIndex } from "@/components/ui/SectionIndex";
-import { ABOUT } from "@/lib/site-content";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function BrandStory({ section }: { section?: HomeSectionRecord }) {
+  const t = useT();
   const imageRight = section?.variant === "image-right";
   const image = section?.image || "/images/home/brand-story.jpg";
-  const title = section?.title || ABOUT.headline;
-  const body = section?.body || ABOUT.body;
+  const title = section?.title || t.about.headline;
+  const body = section?.body || t.about.body;
   const eyebrow = section?.eyebrow || "Terra Ferro Tech";
   const features = section?.config.features?.length
     ? section.config.features
-    : ABOUT.values.map((item) => ({ title: item.title, body: item.body }));
-  const ctaLabel = section?.ctaLabel || "Rreth Nesh";
+    : [
+        { title: t.about.value1Title, body: t.about.value1Body },
+        { title: t.about.value2Title, body: t.about.value2Body },
+        { title: t.about.value3Title, body: t.about.value3Body },
+      ];
+  const ctaLabel = section?.ctaLabel || t.nav.about;
   const ctaHref = section?.ctaHref || "/rreth-nesh";
 
   const photo = (
@@ -55,7 +62,7 @@ export default function BrandStory({ section }: { section?: HomeSectionRecord })
   return (
     <section className="overflow-hidden bg-ivory py-[88px] text-ink md:py-[104px]">
       <div className="container-site">
-        <SectionIndex index="06" label="Rreth Nesh" tone="light" />
+        <SectionIndex index="06" label={t.nav.about} tone="light" />
         <div className="mt-6 grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
           {imageRight ? (
             <>

@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import QuoteButton from "@/components/product/QuoteButton";
@@ -6,7 +8,8 @@ import { Reveal } from "@/components/motion/Reveal";
 import { productHref } from "@/lib/product-path";
 import { coverUrl, type PublicProduct } from "@/lib/types";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
-import { productImageAlt } from "@/lib/seo";
+import { productImageAlt } from "@/lib/product-path";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
 
 export default function TechnicalHighlight({
   section,
@@ -15,6 +18,8 @@ export default function TechnicalHighlight({
   section: HomeSectionRecord;
   product: PublicProduct | null;
 }) {
+  const t = useT();
+  const locale = useLocale();
   if (!product) return null;
   const cover = coverUrl(product);
   const image = section.image || cover;
@@ -28,12 +33,12 @@ export default function TechnicalHighlight({
             {section.title || product.name}
           </h2>
           <p className="mt-4 text-base leading-relaxed text-ink/65">
-            {section.body || product.shortDescription || "Fuqi dhe qëndrueshmëri për punën tuaj bujqësore."}
+            {section.body || product.shortDescription || t.home.heroSubtitle}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <QuoteButton productId={product.id} productLabel={product.fullTitle} />
-            <Button href={section.ctaHref || productHref(product)} variant="dark" arrow>
-              {section.ctaLabel || "Shiko Modelin"}
+            <Button href={section.ctaHref || productHref(product, locale)} variant="dark" arrow>
+              {section.ctaLabel || t.home.viewModel}
             </Button>
           </div>
         </Reveal>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuote } from "@/components/quote/QuoteProvider";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function FeaturedQuoteButton({
   productId,
@@ -10,6 +11,7 @@ export default function FeaturedQuoteButton({
   productLabel: string;
 }) {
   const { openQuote } = useQuote();
+  const t = useT();
 
   return (
     <button
@@ -17,7 +19,7 @@ export default function FeaturedQuoteButton({
       onClick={() => openQuote({ productId, productLabel })}
       className="text-[12px] font-semibold tracking-[0.12em] uppercase text-ink/55 transition hover:text-tractor-red"
     >
-      Kërko Ofertë
+      {t.nav.quote}
     </button>
   );
 }

@@ -4,12 +4,12 @@ import type { PublicProduct } from "@/lib/types";
 import { productHighlights } from "@/lib/specs";
 import { Reveal } from "@/components/motion/Reveal";
 import { productContainer } from "./product-shell";
-import { useT } from "@/components/i18n/LocaleProvider";
+import { useT, useLocale } from "@/components/i18n/LocaleProvider";
 
 export default function ProductHighlights({
   product }: { product: PublicProduct }) {
   const t = useT();
-  const items = productHighlights(product);
+  const items = productHighlights(product, useLocale());
   if (items.length === 0) return null;
 
   return (

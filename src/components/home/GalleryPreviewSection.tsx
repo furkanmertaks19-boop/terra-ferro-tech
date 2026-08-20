@@ -1,11 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { Play } from "@phosphor-icons/react/ssr";
+import { Play } from "@phosphor-icons/react";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import { Button } from "@/components/ui/Button";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
 import type { PublicGalleryItem } from "@/lib/gallery";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function GalleryPreviewSection({
   section,
@@ -14,12 +17,13 @@ export default function GalleryPreviewSection({
   section: HomeSectionRecord;
   items: PublicGalleryItem[];
 }) {
+  const t = useT();
   if (!items.length) return null;
-  const title = section.title || "Momente nga Terra Ferro Tech";
-  const body = section.body || "Foto dhe video nga makineritë, dorëzimet dhe puna në terren.";
-  const ctaLabel = section.ctaLabel || "Shiko Galerinë";
+  const title = section.title || t.home.galleryHeadline;
+  const body = section.body || t.home.galleryBody;
+  const ctaLabel = section.ctaLabel || t.home.galleryCta;
   const ctaHref = section.ctaHref || "/galeri";
-  const eyebrow = section.eyebrow || "Galeria";
+  const eyebrow = section.eyebrow || t.nav.gallery;
 
   return (
     <section className="section-pad bg-ivory text-ink">

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { HP_RANGES } from "@/lib/templates";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 type Props = {
   seriesOptions: string[];
@@ -15,6 +16,7 @@ export default function TractorFilters({ seriesOptions, stageOptions, searchPlac
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const t = useT();
 
   function setParam(key: string, value: string) {
     const next = new URLSearchParams(params.toString());
@@ -29,12 +31,12 @@ export default function TractorFilters({ seriesOptions, stageOptions, searchPlac
       {!hideSearch && (
         <div>
           <label htmlFor="q" className="mb-2 block text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/50">
-            Kërko
+            {t.productList.filters}
           </label>
           <input
             id="q"
             defaultValue={params.get("q") ?? ""}
-            placeholder={searchPlaceholder ?? "Kërko sipas modelit..."}
+            placeholder={searchPlaceholder ?? t.productList.searchTractors}
             className="w-full border border-ink/15 bg-white px-3 py-2.5 text-sm text-ink"
             onBlur={(e) => setParam("q", e.target.value.trim())}
             onKeyDown={(e) => {
@@ -49,11 +51,11 @@ export default function TractorFilters({ seriesOptions, stageOptions, searchPlac
 
       {seriesOptions.length > 0 && (
         <fieldset>
-          <legend className="mb-2 text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/50">Seria</legend>
+          <legend className="mb-2 text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/50">{t.productList.series}</legend>
           <div className="space-y-1.5">
             <FilterOption
               active={!params.get("series")}
-              label="Të gjitha"
+              label={t.home.allOptions}
               onClick={() => setParam("series", "")}
             />
             {seriesOptions.map((series) => (
@@ -69,9 +71,9 @@ export default function TractorFilters({ seriesOptions, stageOptions, searchPlac
       )}
 
       <fieldset>
-        <legend className="mb-2 text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/50">Fuqia (HP)</legend>
+          <legend className="mb-2 text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/50">{t.productList.horsePower}</legend>
         <div className="space-y-1.5">
-          <FilterOption active={!params.get("hp")} label="Të gjitha" onClick={() => setParam("hp", "")} />
+          <FilterOption active={!params.get("hp")} label={t.home.allOptions} onClick={() => setParam("hp", "")} />
           {HP_RANGES.map((range) => (
             <FilterOption
               key={range.id}
@@ -84,10 +86,10 @@ export default function TractorFilters({ seriesOptions, stageOptions, searchPlac
       </fieldset>
 
       <fieldset>
-        <legend className="mb-2 text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/50">Kabina / ROPS</legend>
+          <legend className="mb-2 text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/50">{t.productList.cabin} / ROPS</legend>
         <div className="space-y-1.5">
-          <FilterOption active={!params.get("cabin")} label="Të gjitha" onClick={() => setParam("cabin", "")} />
-          <FilterOption active={params.get("cabin") === "yes"} label="Kabinë" onClick={() => setParam("cabin", "yes")} />
+          <FilterOption active={!params.get("cabin")} label={t.home.allOptions} onClick={() => setParam("cabin", "")} />
+          <FilterOption active={params.get("cabin") === "yes"} label={t.productDetail.cabin} onClick={() => setParam("cabin", "yes")} />
           <FilterOption active={params.get("cabin") === "no"} label="ROPS" onClick={() => setParam("cabin", "no")} />
         </div>
       </fieldset>
@@ -96,7 +98,7 @@ export default function TractorFilters({ seriesOptions, stageOptions, searchPlac
         <fieldset>
           <legend className="mb-2 text-[11px] font-semibold tracking-[0.16em] uppercase text-ink/50">Stage</legend>
           <div className="space-y-1.5">
-            <FilterOption active={!params.get("stage")} label="Të gjitha" onClick={() => setParam("stage", "")} />
+            <FilterOption active={!params.get("stage")} label={t.home.allOptions} onClick={() => setParam("stage", "")} />
             {stageOptions.map((stage) => (
               <FilterOption
                 key={stage}

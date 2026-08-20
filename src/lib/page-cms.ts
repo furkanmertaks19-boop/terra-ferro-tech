@@ -4,6 +4,7 @@ import { parseI18nBag, type I18nBag } from "@/lib/i18n/config";
 import type { Locale } from "@/lib/i18n/config";
 import { localizeHref } from "@/lib/i18n/routing";
 import { str } from "@/lib/i18n/content";
+import { localizeKnownUi } from "@/lib/i18n/phrases";
 
 export const PAGE_KEYS = ["about", "tractors", "equipment", "gallery", "services", "contact"] as const;
 export type PageKey = (typeof PAGE_KEYS)[number];
@@ -426,8 +427,7 @@ function localizeConfig(config: PageConfig, locale: Locale, overlay: unknown): P
   const next = { ...config } as Record<string, unknown>;
   for (const key of Object.keys(next)) {
     if (typeof next[key] === "string" && key !== "ctaHref" && key !== "introImage") {
-      const localized = str(extra[key]);
-      if (localized) next[key] = localized;
+      next[key] = localizeKnownUi(str(extra[key], next[key] as string), locale);
     }
   }
   if (Array.isArray((config as AboutConfig).features) && Array.isArray(extra.features)) {
@@ -437,6 +437,20 @@ function localizeConfig(config: PageConfig, locale: Locale, overlay: unknown): P
     next.items = mergeFeatureCopy((config as ServicesConfig).items, extra.items);
   }
   if (typeof next.ctaHref === "string") next.ctaHref = localizeHref(next.ctaHref, locale);
+  if (Array.isArray(next.features)) {
+    next.features = (next.features as PageFeatureItem[]).map((item) => ({
+      ...item,
+      title: localizeKnownUi(item.title, locale),
+      body: localizeKnownUi(item.body, locale),
+    }));
+  }
+  if (Array.isArray(next.items)) {
+    next.items = (next.items as PageFeatureItem[]).map((item) => ({
+      ...item,
+      title: localizeKnownUi(item.title, locale),
+      body: localizeKnownUi(item.body, locale),
+    }));
+  }
   return next as PageConfig;
 }
 
@@ -461,9 +475,9 @@ export function localizePageRevision(revision: PageRevision, locale: Locale): Pa
   const copy = locale === "sq" ? {} : parseI18nBag(revision.i18n)[locale] ?? {};
   return {
     ...revision,
-    eyebrow: str(copy.eyebrow, revision.eyebrow),
-    title: str(copy.title, revision.title),
-    description: str(copy.description, revision.description),
+    eyebrow: localizeKnownUi(str(copy.eyebrow, revision.eyebrow), locale),
+    title: localizeKnownUi(str(copy.title, revision.title), locale),
+    description: localizeKnownUi(str(copy.description, revision.description), locale),
     config: localizeConfig(revision.config, locale, copy.config),
   };
 }

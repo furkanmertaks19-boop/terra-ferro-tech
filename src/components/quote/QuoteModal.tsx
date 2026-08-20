@@ -44,7 +44,7 @@ export default function QuoteModal() {
         <div className="fixed inset-0 z-[70] flex justify-end">
           <motion.button
             type="button"
-            aria-label="Mbyll"
+            aria-label={t.quoteForm.close}
             className="absolute inset-0 bg-ink/50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -72,7 +72,7 @@ export default function QuoteModal() {
                 type="button"
                 onClick={closeQuote}
                 className="grid h-11 w-11 place-items-center border border-ink/15 text-ink hover:border-tractor-red hover:text-tractor-red"
-                aria-label="Mbyll formularin"
+                aria-label={t.quoteForm.close}
               >
                 <X size={18} />
               </button>

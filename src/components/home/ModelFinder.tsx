@@ -7,6 +7,8 @@ import type { PublicProduct } from "@/lib/types";
 import { productHref } from "@/lib/product-path";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
+import { pathFor } from "@/lib/i18n/routing";
 
 type Props = {
   seriesOptions: string[];
@@ -16,6 +18,8 @@ type Props = {
 
 export default function ModelFinder({ seriesOptions, hpOptions, section }: Props) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useT();
   const boxRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [series, setSeries] = useState("");
@@ -55,7 +59,8 @@ export default function ModelFinder({ seriesOptions, hpOptions, section }: Props
       params.set("hpMax", String(n));
     }
     const qs = params.toString();
-    router.push(qs ? `/traktoret?${qs}` : "/traktoret");
+    const base = pathFor("tractors", locale);
+    router.push(qs ? `${base}?${qs}` : base);
   }
 
   return (
@@ -67,9 +72,9 @@ export default function ModelFinder({ seriesOptions, hpOptions, section }: Props
         >
           <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <SectionIndex index="02" label={section?.eyebrow || "Gjej modelin"} tone="light" />
+              <SectionIndex index="02" label={section?.eyebrow || t.home.findModelEyebrow} tone="light" />
               <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight md:text-4xl">
-                {section?.title || "Gjej modelin"}
+                {section?.title || t.home.findModel}
               </h2>
             </div>
           </div>
@@ -77,7 +82,7 @@ export default function ModelFinder({ seriesOptions, hpOptions, section }: Props
           <div className="grid items-end gap-4 lg:grid-cols-12">
             <div ref={boxRef} className="relative lg:col-span-3">
               <label htmlFor="model-search" className="mb-1.5 block text-[13px] tracking-[0.16em] uppercase text-ink/45">
-                Modeli
+                {t.home.modelLabel}
               </label>
               <input
                 id="model-search"
@@ -95,7 +100,7 @@ export default function ModelFinder({ seriesOptions, hpOptions, section }: Props
                       <button
                         type="button"
                         className="flex w-full items-center justify-between px-4 py-3 text-left text-sm hover:bg-ink/5"
-                        onClick={() => router.push(productHref(product))}
+                        onClick={() => router.push(productHref(product, locale))}
                       >
                         <span>{product.name}</span>
                         <span className="text-xs text-ink/45">{product.series}</span>
@@ -108,11 +113,11 @@ export default function ModelFinder({ seriesOptions, hpOptions, section }: Props
 
             <Select
               className="lg:col-span-3"
-              label="Seria"
+              label={t.home.seriesLabel}
               value={series}
               onChange={setSeries}
               options={[
-                { value: "", label: "Të gjitha" },
+                { value: "", label: t.home.allOptions },
                 ...seriesOptions.map((s) => ({ value: s, label: s })),
               ]}
             />
@@ -123,20 +128,20 @@ export default function ModelFinder({ seriesOptions, hpOptions, section }: Props
               value={hp}
               onChange={setHp}
               options={[
-                { value: "", label: "Të gjitha" },
+                { value: "", label: t.home.allOptions },
                 ...hpOptions.map((n) => ({ value: String(n), label: `${n} HP` })),
               ]}
             />
 
             <Select
               className="lg:col-span-2"
-              label="Kabinë"
+              label={t.productList.cabin}
               value={cabin}
               onChange={setCabin}
               options={[
-                { value: "", label: "Të gjitha" },
-                { value: "yes", label: "Kabinë" },
-                { value: "no", label: "ROPS" },
+                { value: "", label: t.home.allOptions },
+                { value: "yes", label: t.productDetail.cabin },
+                { value: "no", label: t.productDetail.rops },
               ]}
             />
 
@@ -145,7 +150,7 @@ export default function ModelFinder({ seriesOptions, hpOptions, section }: Props
                 type="submit"
                 className="btn-wipe inline-flex w-full items-center justify-center gap-2 rounded-[3px] bg-tractor-red px-5 py-3.5 text-[12px] font-semibold tracking-[0.12em] uppercase text-white"
               >
-                <span className="relative z-[1]">Gjej modelin</span>
+                <span className="relative z-[1]">{t.home.findModel}</span>
                 <ArrowRight size={14} className="relative z-[1]" />
               </button>
             </div>

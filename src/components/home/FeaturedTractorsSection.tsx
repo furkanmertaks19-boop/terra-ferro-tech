@@ -1,19 +1,21 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "@phosphor-icons/react/ssr";
+import { ArrowUpRight } from "@phosphor-icons/react";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import { Button } from "@/components/ui/Button";
-import { productHref } from "@/lib/product-path";
+import { productHref, productImageAlt } from "@/lib/product-path";
 import { coverUrl, type PublicProduct } from "@/lib/types";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
 import QuoteButton from "@/components/product/QuoteButton";
-import { productImageAlt } from "@/lib/seo";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
 
-function specLine(product: PublicProduct) {
+function specLine(product: PublicProduct, cabin: string, rops: string) {
   const parts: string[] = [];
   if (product.horsePower != null) parts.push(`${product.horsePower} HP`);
-  parts.push(product.hasCabin ? "Kabinë" : "ROPS");
+  parts.push(product.hasCabin ? cabin : rops);
   if (product.stage) parts.push(product.stage);
   return parts.join(" · ");
 }
@@ -25,12 +27,14 @@ export default function FeaturedTractorsSection({
   products: PublicProduct[];
   section?: HomeSectionRecord;
 }) {
+  const t = useT();
+  const locale = useLocale();
   if (products.length === 0) return null;
-  const title = section?.title || "Modelet e zgjedhura të traktorëve";
-  const body = section?.body || "Zgjidhni nga modelet më të përshtatshme për pemishte, fusha dhe përdorim të përditshëm.";
-  const ctaLabel = section?.ctaLabel || "Shiko të gjithë traktorët";
+  const title = section?.title || t.home.featuredTitle;
+  const body = section?.body || t.home.featuredTractorsBody;
+  const ctaLabel = section?.ctaLabel || t.home.viewAllTractors;
   const ctaHref = section?.ctaHref || "/traktoret";
-  const eyebrow = section?.eyebrow || "Traktorët";
+  const eyebrow = section?.eyebrow || t.nav.tractors;
 
   return (
     <section className="section-pad bg-warm-white text-ink">
@@ -49,7 +53,7 @@ export default function FeaturedTractorsSection({
             return (
               <StaggerItem key={product.id} className="h-full">
                 <article className="group flex h-full flex-col border border-ink/10 bg-ivory transition-transform duration-300 ease-out-expo hover:-translate-y-1">
-                  <Link href={productHref(product)} className="flex flex-1 flex-col">
+                  <Link href={productHref(product, locale)} className="flex flex-1 flex-col">
                     <div className="relative aspect-[4/3] overflow-hidden bg-[#e8e3d8]">
                       {cover ? (
                         <Image
@@ -72,12 +76,12 @@ export default function FeaturedTractorsSection({
                         </p>
                       ) : null}
                       <h3 className="mt-2 font-display text-2xl font-semibold tracking-tight">{product.name}</h3>
-                      <p className="mt-1 text-base text-ink/55">{specLine(product)}</p>
+                      <p className="mt-1 text-base text-ink/55">{specLine(product, t.productDetail.cabin, t.productDetail.rops)}</p>
                       {summary ? (
                         <p className="mt-3 line-clamp-2 text-base leading-relaxed text-ink/60">{summary}</p>
                       ) : null}
                       <span className="mt-auto inline-flex items-center gap-2 pt-5 text-[13px] font-semibold tracking-[0.12em] uppercase">
-                        Shiko Modelin
+                        {t.home.viewModel}
                         <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
                       </span>
                     </div>

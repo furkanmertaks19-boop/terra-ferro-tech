@@ -6,7 +6,7 @@ import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function CatalogToolbar({
   hideHp = false,
-  searchPlaceholder = "Kërko makineri...",
+  searchPlaceholder = "",
   showFilters = false,
 }: {
   hideHp?: boolean;
@@ -22,7 +22,7 @@ export default function CatalogToolbar({
 
   const options = [
     { value: "newest", label: t.productList.sortNewest },
-    { value: "name-asc", label: "Emri A-Z" },
+    { value: "name-asc", label: t.productList.sortName },
     ...(!hideHp
       ? [
           { value: "hp-asc", label: t.productList.sortHpAsc },
@@ -53,7 +53,7 @@ export default function CatalogToolbar({
         <span className="sr-only">{searchPlaceholder}</span>
         <input
           defaultValue={searchParams.get("q") ?? ""}
-          placeholder={searchPlaceholder}
+          placeholder={searchPlaceholder || t.productList.searchEquipment}
           className="h-10 w-full border border-ink/15 bg-warm-white px-3 text-sm text-ink placeholder:text-ink/40 outline-none transition-colors focus:border-ink/40 sm:h-11 sm:px-4 sm:text-base"
           onBlur={(e) => update("q", e.target.value.trim())}
           onKeyDown={(e) => {
@@ -77,7 +77,7 @@ export default function CatalogToolbar({
           </button>
         ) : null}
         <label className="flex min-w-0 flex-1 items-center gap-2 text-[11px] tracking-[0.08em] uppercase text-ink/55 sm:flex-none">
-          <span className="hidden sm:inline">Rendit</span>
+          <span className="hidden sm:inline">{t.productList.sortLabel}</span>
           <span className="relative min-w-0 flex-1 sm:flex-none">
             <select
               value={searchParams.get("sort") ?? "newest"}

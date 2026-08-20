@@ -1,11 +1,15 @@
+"use client";
+
 import { Button } from "@/components/ui/Button";
 import FullWidthCtaActions from "./FullWidthCtaActions";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
 import { Reveal } from "@/components/motion/Reveal";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function FullWidthCta({ section }: { section?: HomeSectionRecord }) {
-  const title = section?.title || "Kërkoni makinën e duhur?";
-  const body = section?.body || "Flisni me ekipin tonë.";
+  const t = useT();
+  const title = section?.title || t.home.ctaNeedMachine;
+  const body = section?.body || t.home.ctaTalk;
   const ctaHref = section?.ctaHref || "/kontakt";
   const dark = section?.variant === "dark";
 
@@ -20,9 +24,9 @@ export default function FullWidthCta({ section }: { section?: HomeSectionRecord 
             {body ? <p className="mt-3 text-base text-white/80">{body}</p> : null}
           </div>
           <div className="flex flex-wrap gap-3">
-            <FullWidthCtaActions />
+          <FullWidthCtaActions />
             <Button href={ctaHref} variant="secondary">
-              Na Kontaktoni
+              {section?.ctaLabel || t.home.contactUs}
             </Button>
           </div>
         </div>

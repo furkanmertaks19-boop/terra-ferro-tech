@@ -1,18 +1,21 @@
+"use client";
+
 import LocaleLink from "@/components/i18n/LocaleLink";
 import Image from "next/image";
-import { ArrowUpRight } from "@phosphor-icons/react/ssr";
+import { ArrowUpRight } from "@phosphor-icons/react";
 import { UsedTractorDrive, UsedTractorStatus } from "@prisma/client";
 import QuoteButton from "@/components/product/QuoteButton";
 import {
   usedTractorCover,
   usedTractorHref,
   usedTractorLabel,
-  type PublicUsedTractor,
-} from "@/lib/used-tractors";
+} from "@/lib/used-tractor-path";
+import type { PublicUsedTractor } from "@/lib/used-tractors";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
 
-function statusBadge(status: UsedTractorStatus) {
-  if (status === UsedTractorStatus.SOLD) return { label: "E SHITUR", className: "bg-ink text-white" };
-  if (status === UsedTractorStatus.RESERVED) return { label: "E REZERVUAR", className: "bg-tractor-red text-white" };
+function statusBadge(status: UsedTractorStatus, t: ReturnType<typeof useT>) {
+  if (status === UsedTractorStatus.SOLD) return { label: t.used.sold, className: "bg-ink text-white" };
+  if (status === UsedTractorStatus.RESERVED) return { label: t.used.reserved, className: "bg-tractor-red text-white" };
   return null;
 }
 
@@ -23,20 +26,22 @@ function driveLabel(drive: UsedTractorDrive | null) {
 }
 
 export default function UsedTractorCard({ item }: { item: PublicUsedTractor }) {
+  const t = useT();
+  const locale = useLocale();
   const cover = usedTractorCover(item);
-  const badge = statusBadge(item.status);
+  const badge = statusBadge(item.status, t);
   const facts = [
-    item.year ? `Viti ${item.year}` : null,
-    item.hours != null ? `${item.hours.toLocaleString("sq-AL")} orë` : null,
+    item.year ? `${t.usedPage.year} ${item.year}` : null,
+    item.hours != null ? `${item.hours.toLocaleString("sq-AL")} ${t.usedPage.hours.toLowerCase()}` : null,
     item.horsePower != null ? `${item.horsePower} HP` : null,
   ].filter(Boolean);
-  const extras = [driveLabel(item.drive), item.hasCabin ? "Kabinë" : "ROPS", item.fuelType].filter(Boolean).slice(0, 3);
+  const extras = [driveLabel(item.drive), item.hasCabin ? t.productDetail.cabin : t.productDetail.rops, item.fuelType].filter(Boolean).slice(0, 3);
   const label = usedTractorLabel(item);
   const sold = item.status === UsedTractorStatus.SOLD;
 
   return (
     <article className="group flex h-full flex-col border border-ink/10 bg-warm-white">
-      <LocaleLink href={usedTractorHref(item.slug)} className="flex flex-1 flex-col">
+      <LocaleLink href={usedTractorHref(item.slug, locale)} className="flex flex-1 flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-[#e8e3d8]">
           {badge ? (
             <span className={`absolute left-3 top-3 z-[2] px-2.5 py-1 text-[11px] font-semibold tracking-[0.14em] uppercase ${badge.className}`}>
@@ -54,7 +59,7 @@ export default function UsedTractorCard({ item }: { item: PublicUsedTractor }) {
           ) : (
             <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
               <p className="text-[13px] tracking-[0.16em] uppercase text-ink/35">Terra Ferro Tech</p>
-              <p className="text-sm text-ink/40">Imazhi së shpejti</p>
+              <p className="text-sm text-ink/40">{t.productDetail.noImage}</p>
             </div>
           )}
         </div>
@@ -64,7 +69,7 @@ export default function UsedTractorCard({ item }: { item: PublicUsedTractor }) {
           <p className="mt-2 text-sm text-ink/55">{facts.join(" · ")}</p>
           {extras.length ? <p className="mt-1 text-sm text-ink/45">{extras.join(" · ")}</p> : null}
           <span className="mt-auto inline-flex items-center gap-2 pt-5 text-[12px] font-semibold tracking-[0.12em] uppercase">
-            Shiko Detajet
+            {t.productList.viewDetails}
             <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>
         </div>

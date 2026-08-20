@@ -1,25 +1,25 @@
 "use client";
 
 import { Suspense } from "react";
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LOCALES, LOCALE_SHORT, type Locale } from "@/lib/i18n/config";
-import { localeFromPathname, switchLocalePath } from "@/lib/i18n/routing";
+import { switchLocalePath } from "@/lib/i18n/routing";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 
 function SwitcherInner({ inverted = false }: { inverted?: boolean }) {
   const locale = useLocale();
+  const router = useRouter();
   const pathname = usePathname() || "/";
   const searchParams = useSearchParams();
-  const current = localeFromPathname(pathname) || locale;
-  const search = searchParams?.toString();
-  const suffix = search ? `?${search}` : "";
+  const params = new URLSearchParams(searchParams?.toString() ?? "");
+  params.delete("_l");
+  const suffix = params.toString() ? `?${params.toString()}` : "";
 
   return (
     <nav aria-label="Language" className="flex items-center gap-0.5">
       {LOCALES.map((item, index) => {
         const href = switchLocalePath(pathname, item, suffix);
-        const active = item === current;
+        const active = item === locale;
         return (
           <span key={item} className="flex items-center">
             {index > 0 ? (
@@ -27,7 +27,7 @@ function SwitcherInner({ inverted = false }: { inverted?: boolean }) {
                 |
               </span>
             ) : null}
-            <Link
+            <a
               href={href}
               hrefLang={item}
               lang={item}
@@ -41,9 +41,15 @@ function SwitcherInner({ inverted = false }: { inverted?: boolean }) {
                     ? "text-white/70 hover:text-white"
                     : "text-ink/50 hover:text-ink"
               }`}
+              onClick={(event) => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+                event.preventDefault();
+                router.push(href);
+                router.refresh();
+              }}
             >
               {LOCALE_SHORT[item as Locale]}
-            </Link>
+            </a>
           </span>
         );
       })}

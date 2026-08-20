@@ -9,12 +9,13 @@ import { getRequestLocale } from "@/lib/i18n/request";
 import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const [settings, locale] = await Promise.all([getSiteSettings(), getRequestLocale()]);
 
   return (
-    <LocaleProvider locale={locale}>
+    <LocaleProvider locale={locale} key={locale}>
       <QuoteProvider contact={settings}>
         <div className="flex min-h-dvh flex-col overflow-x-hidden bg-ivory text-ink">
           <ScrollProgress />

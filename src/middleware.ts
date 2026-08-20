@@ -48,7 +48,9 @@ export default auth((req) => {
 
   if (path.startsWith("/admin") || path.startsWith("/api")) {
     const requestHeaders = new Headers(req.headers);
-    requestHeaders.set(LOCALE_HEADER, DEFAULT_LOCALE);
+    const cookieLocale = req.cookies.get("NEXT_LOCALE")?.value;
+    const apiLocale = path.startsWith("/api") && isLocale(cookieLocale) ? cookieLocale : DEFAULT_LOCALE;
+    requestHeaders.set(LOCALE_HEADER, path.startsWith("/admin") ? DEFAULT_LOCALE : apiLocale);
     requestHeaders.set(PATHNAME_HEADER, path);
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
@@ -62,6 +64,7 @@ export default auth((req) => {
   const url = req.nextUrl.clone();
   if (internal && internal !== path) {
     url.pathname = internal;
+    url.searchParams.set("_l", locale);
     const response = NextResponse.rewrite(url, { request: { headers: requestHeaders } });
     return applyLocaleHeaders(req, locale, path, response);
   }

@@ -10,6 +10,7 @@ import { getRequestLocale } from "@/lib/i18n/request";
 import { parseI18nBag } from "@/lib/i18n/config";
 import { str } from "@/lib/i18n/content";
 import { localizeHref } from "@/lib/i18n/routing";
+import { localizeKnownUi } from "@/lib/i18n/phrases";
 
 const FALLBACK: HomeSectionRecord[] = [
   {
@@ -149,12 +150,12 @@ function mapSection(row: {
     id: row.id,
     type: row.type,
     variant: row.variant,
-    title: str(copy.title, row.title),
-    eyebrow: str(copy.eyebrow, row.eyebrow),
-    body: str(copy.body, row.body),
+    title: localizeKnownUi(str(copy.title, row.title), locale),
+    eyebrow: localizeKnownUi(str(copy.eyebrow, row.eyebrow), locale),
+    body: localizeKnownUi(str(copy.body, row.body), locale),
     image: row.image,
     mobileImage: row.mobileImage,
-    ctaLabel: str(copy.ctaLabel, row.ctaLabel),
+    ctaLabel: localizeKnownUi(str(copy.ctaLabel, row.ctaLabel), locale),
     ctaHref: forAdmin ? row.ctaHref : localizeHref(row.ctaHref || "/", locale),
     config: parseHomeConfig(row.config),
     sortOrder: row.sortOrder,
@@ -173,7 +174,17 @@ export async function getHomeSections(includeHidden = false): Promise<HomeSectio
     const mapped = rows
       .map((row) => mapSection(row, locale, includeHidden))
       .filter((row): row is HomeSectionRecord => Boolean(row));
-    if (!mapped.length) return includeHidden ? FALLBACK : FALLBACK.filter((row) => row.isVisible);
+    if (!mapped.length) {
+      const fallback = includeHidden ? FALLBACK : FALLBACK.filter((row) => row.isVisible);
+      return fallback.map((row) => ({
+        ...row,
+        title: localizeKnownUi(row.title, locale),
+        eyebrow: localizeKnownUi(row.eyebrow, locale),
+        body: localizeKnownUi(row.body, locale),
+        ctaLabel: localizeKnownUi(row.ctaLabel, locale),
+        ctaHref: includeHidden ? row.ctaHref : localizeHref(row.ctaHref || "/", locale),
+      }));
+    }
     return includeHidden ? mapped : mapped.filter((row) => row.isVisible);
   } catch {
     return includeHidden ? FALLBACK : FALLBACK.filter((row) => row.isVisible);

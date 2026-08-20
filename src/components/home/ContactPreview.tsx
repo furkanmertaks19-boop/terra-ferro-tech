@@ -1,7 +1,10 @@
+"use client";
+
 import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
 import type { PublicSiteSettings } from "@/lib/site-settings";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function ContactPreview({
   section,
@@ -10,12 +13,13 @@ export default function ContactPreview({
   section: HomeSectionRecord;
   settings: PublicSiteSettings;
 }) {
+  const t = useT();
   return (
     <section className="border-t border-ink/8 bg-ivory py-16 text-ink md:py-20">
       <Reveal>
         <div className="container-site grid gap-8 md:grid-cols-2 md:items-end">
           <div>
-            <p className="text-[13px] tracking-[0.16em] uppercase text-tractor-red">{section.eyebrow || "Kontakt"}</p>
+            <p className="text-[13px] tracking-[0.16em] uppercase text-tractor-red">{section.eyebrow || t.nav.contact}</p>
             <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3.2rem)] font-semibold tracking-tight">
               {section.title || settings.companyName}
             </h2>
@@ -31,7 +35,7 @@ export default function ContactPreview({
             <p>{settings.location}</p>
             <div className="pt-3">
               <Button href={section.ctaHref || "/kontakt"} variant="dark" arrow>
-                {section.ctaLabel || "Na Kontaktoni"}
+                {section.ctaLabel || t.home.contactUs}
               </Button>
             </div>
           </div>

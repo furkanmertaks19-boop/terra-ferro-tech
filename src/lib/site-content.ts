@@ -24,28 +24,18 @@ export function publicNavLinks(usedTractorsEnabled: boolean, locale: Locale = DE
 export const NAV_LINKS = publicNavLinks(false);
 export const USED_TRACTORS_NAV = { href: pathFor("used"), label: getDictionary().nav.usedTractors };
 
-export const SERVICES = [
-  {
-    title: "Konsulencë për zgjedhjen e traktorit",
-    body: "Ju ndihmojmë të zgjidhni modelin, serinë dhe fuqinë e duhur për tokën dhe kulturat tuaja.",
-  },
-  {
-    title: "Shitje",
-    body: "Gama ArmaTrac e traktorëve dhe makinerive bujqësore, me këshillim të drejtpërdrejtë nga ekipi ynë.",
-  },
-  {
-    title: "Pjesë këmbimi",
-    body: "Furnizim me pjesë për të mbajtur makinerinë në punë gjatë sezonit.",
-  },
-  {
-    title: "Mbështetje teknike",
-    body: "Mbështetje pas shitjes për përdorimin dhe mirëmbajtjen e pajisjeve.",
-  },
-  {
-    title: "Servis",
-    body: "Shërbim për makinerinë që keni blerë, që puna në fushë të mos ndalet.",
-  },
-] as const;
+export function servicesList(locale: Locale = DEFAULT_LOCALE) {
+  const t = getDictionary(locale);
+  return [
+    { title: t.services.consultTitle, body: t.services.consultBody },
+    { title: t.services.salesTitle, body: t.services.salesBody },
+    { title: t.services.partsTitle, body: t.services.partsBody },
+    { title: t.services.supportTitle, body: t.services.supportBody },
+    { title: t.services.serviceTitle, body: t.services.serviceBody },
+  ];
+}
+
+export const SERVICES = servicesList("sq");
 
 export const TRUST_STATS = {
   enabled: false,

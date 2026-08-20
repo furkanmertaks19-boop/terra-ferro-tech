@@ -2,6 +2,8 @@ import { Category } from "@prisma/client";
 import type { SpecGroup, SpecRow } from "@/lib/admin-content";
 import { publicSubcategoryLabel } from "@/lib/product-path";
 import type { PublicProduct } from "@/lib/types";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/config";
+import { getDictionary, type Messages } from "@/lib/i18n/dictionaries";
 
 export const SPEC_KEYS = {
   model: "Modeli",
@@ -98,19 +100,20 @@ export function canonicalSpecKey(key: string): string {
   return KEY_ALIASES[normalized.toLowerCase()] ?? normalized;
 }
 
-export function displaySpecValue(key: string, value: string): string {
+export function displaySpecValue(key: string, value: string, locale: Locale = DEFAULT_LOCALE): string {
+  const t = getDictionary(locale);
   const canon = canonicalSpecKey(key);
   const raw = value.trim();
   const lower = raw.toLowerCase();
 
   if (canon === SPEC_KEYS.usage) {
-    if (lower === "field" || lower === "tarla") return "Përdorim në fushë";
-    if (lower === "orchard" || lower === "fruit garden" || lower === "bahçe" || lower === "bahce") return "Pemishte";
+    if (lower === "field" || lower === "tarla") return t.spec.fieldUse;
+    if (lower === "orchard" || lower === "fruit garden" || lower === "bahçe" || lower === "bahce" || lower === "pemishte") return t.spec.orchard;
     return raw;
   }
   if (canon === SPEC_KEYS.ac) {
-    if (lower === "yes" || lower === "po") return "Po";
-    if (lower === "no" || lower === "jo") return "Jo";
+    if (lower === "yes" || lower === "po") return t.spec.yes;
+    if (lower === "no" || lower === "jo") return t.spec.no;
     if (lower === "standard") return "Standard";
     return raw;
   }
@@ -125,12 +128,45 @@ export function displaySpecValue(key: string, value: string): string {
     return raw;
   }
   if (canon === SPEC_KEYS.cabin) {
-    if (lower === "cabin" || lower === "kabinë" || lower === "kabine" || lower === "po") return "Cabin";
-    if (lower === "rops" || lower === "jo" || lower.startsWith("jo ")) return "ROPS";
-    if (lower === "orchard") return "ROPS";
+    if (lower === "cabin" || lower === "kabinë" || lower === "kabine" || lower === "po") return t.productDetail.cabin;
+    if (lower === "rops" || lower === "jo" || lower.startsWith("jo ")) return t.productDetail.rops;
+    if (lower === "orchard") return t.productDetail.rops;
     return raw;
   }
   return raw;
+}
+
+function specLabel(key: string, t: Messages) {
+  const map: Record<string, string> = {
+    [SPEC_KEYS.model]: t.spec.model,
+    [SPEC_KEYS.power]: t.spec.power,
+    [SPEC_KEYS.series]: t.spec.series,
+    [SPEC_KEYS.usage]: t.spec.usage,
+    [SPEC_KEYS.emission]: t.spec.emission,
+    [SPEC_KEYS.engine]: t.spec.engine,
+    [SPEC_KEYS.torque]: t.spec.torque,
+    [SPEC_KEYS.axle]: t.spec.axle,
+    [SPEC_KEYS.gear]: t.spec.gear,
+    [SPEC_KEYS.lift]: t.spec.lift,
+    [SPEC_KEYS.cabin]: t.spec.cabinType,
+    [SPEC_KEYS.ac]: t.spec.ac,
+    "Gjerësia e punës": t.spec.workingWidth,
+    Kapaciteti: t.spec.capacity,
+    Lidhja: t.spec.connection,
+    "HP e nevojshme": t.spec.requiredHp,
+    Kategoria: t.spec.category,
+  };
+  return map[key] ?? key;
+}
+
+function groupTitle(id: string, fallback: string, t: Messages) {
+  if (id === "spec-group-permbledhje") return t.spec.overview;
+  if (id === "spec-group-motori") return t.spec.engine;
+  if (id === "spec-group-transmisioni") return t.spec.transmission;
+  if (id === "spec-group-hidraulika") return t.spec.hydraulics;
+  if (id === "spec-group-komforti") return t.spec.comfort;
+  if (id === "spec-group-te-tjera") return t.spec.other;
+  return fallback;
 }
 
 export function flattenSpecs(specs: Record<string, string> | null | undefined, groups?: SpecGroup[] | null): Record<string, string> {
@@ -158,7 +194,8 @@ export type VisibleSpecGroup = { title: string; rows: { key: string; value: stri
 export function visibleSpecGroups(product: {
   specs?: Record<string, string> | null;
   specGroups?: SpecGroup[] | null | unknown;
-}): VisibleSpecGroup[] {
+}, locale: Locale = DEFAULT_LOCALE): VisibleSpecGroup[] {
+  const t = getDictionary(locale);
   const stored = Array.isArray(product.specGroups) ? (product.specGroups as SpecGroup[]) : null;
   const flat = flattenSpecs(product.specs ?? {}, stored);
   const used = new Set<string>();
@@ -170,49 +207,51 @@ export function visibleSpecGroups(product: {
         const value = flat[key];
         if (!hasSpecValue(value)) return null;
         used.add(key);
-        return { key, value: displaySpecValue(key, value) };
+        return { key: specLabel(key, t), value: displaySpecValue(key, value, locale) };
       })
       .filter((row): row is { key: string; value: string } => row != null);
-    if (rows.length) groups.push({ title: def.title, rows });
+    if (rows.length) groups.push({ title: groupTitle(def.id, def.title, t), rows });
   }
 
   const extra = Object.entries(flat)
     .filter(([key]) => !used.has(key) && !INTERNAL_SPEC_KEYS.has(key))
     .filter(([, value]) => hasSpecValue(value))
-    .map(([key, value]) => ({ key, value: displaySpecValue(key, value) }));
-  if (extra.length) groups.push({ title: "Të tjera", rows: extra });
+    .map(([key, value]) => ({ key: specLabel(key, t), value: displaySpecValue(key, value, locale) }));
+  if (extra.length) groups.push({ title: t.spec.other, rows: extra });
   return groups;
 }
 
-export function tractorHighlights(product: PublicProduct): { label: string; value: string }[] {
+export function tractorHighlights(product: PublicProduct, locale: Locale = DEFAULT_LOCALE): { label: string; value: string }[] {
+  const t = getDictionary(locale);
   const items: { label: string; value: string }[] = [];
-  if (product.horsePower != null) items.push({ label: "Fuqia", value: `${product.horsePower} HP` });
+  if (product.horsePower != null) items.push({ label: t.spec.power, value: `${product.horsePower} HP` });
   if (hasSpecValue(product.stage)) {
-    items.push({ label: "Standardi i emetimeve", value: displaySpecValue(SPEC_KEYS.emission, product.stage!.trim()) });
+    items.push({ label: t.spec.emission, value: displaySpecValue(SPEC_KEYS.emission, product.stage!.trim(), locale) });
   }
-  items.push({ label: "Tipi i kabinës", value: product.hasCabin ? "Cabin" : "ROPS" });
-  if (hasSpecValue(product.series)) items.push({ label: "Seria", value: product.series.trim() });
+  items.push({ label: t.spec.cabinType, value: product.hasCabin ? t.productDetail.cabin : t.productDetail.rops });
+  if (hasSpecValue(product.series)) items.push({ label: t.spec.series, value: product.series.trim() });
   return items.slice(0, 4);
 }
 
 /** @deprecated Use productHighlights */
 export const cinematicHighlights = tractorHighlights;
 
-export function productHighlights(product: PublicProduct): { label: string; value: string }[] {
-  if (product.category !== Category.EQUIPMENT) return tractorHighlights(product);
+export function productHighlights(product: PublicProduct, locale: Locale = DEFAULT_LOCALE): { label: string; value: string }[] {
+  if (product.category !== Category.EQUIPMENT) return tractorHighlights(product, locale);
 
+  const t = getDictionary(locale);
   const flat = flattenSpecs(product.specs, product.specGroups);
   const items: { label: string; value: string }[] = [];
-  const category = publicSubcategoryLabel(product.subcategory) || (hasSpecValue(product.series) ? product.series.trim() : "");
-  if (category) items.push({ label: "Kategoria", value: category });
+  const category = publicSubcategoryLabel(product.subcategory, locale) || (hasSpecValue(product.series) ? product.series.trim() : "");
+  if (category) items.push({ label: t.spec.category, value: category });
   const width = flat["Gjerësia e punës"];
-  if (hasSpecValue(width)) items.push({ label: "Gjerësia e punës", value: width });
+  if (hasSpecValue(width)) items.push({ label: t.spec.workingWidth, value: width });
   const capacity = flat["Kapaciteti"];
-  if (hasSpecValue(capacity)) items.push({ label: "Kapaciteti", value: capacity });
+  if (hasSpecValue(capacity)) items.push({ label: t.spec.capacity, value: capacity });
   const connection = flat["Lidhja"];
-  if (hasSpecValue(connection)) items.push({ label: "Lidhja", value: connection });
+  if (hasSpecValue(connection)) items.push({ label: t.spec.connection, value: connection });
   const requiredHp = flat["HP e nevojshme"];
-  if (items.length < 4 && hasSpecValue(requiredHp)) items.push({ label: "HP e nevojshme", value: requiredHp });
+  if (items.length < 4 && hasSpecValue(requiredHp)) items.push({ label: t.spec.requiredHp, value: requiredHp });
   return items.slice(0, 4);
 }
 

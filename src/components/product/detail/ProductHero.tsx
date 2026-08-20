@@ -10,20 +10,21 @@ import ProductBadges from "@/components/product/ProductBadges";
 import QuoteButton from "@/components/product/QuoteButton";
 import ProductMediaGallery from "./ProductMediaGallery";
 import { productContainer } from "./product-shell";
-import { useT } from "@/components/i18n/LocaleProvider";
+import { useT, useLocale } from "@/components/i18n/LocaleProvider";
 import { productImageAlt } from "@/lib/product-path";
 
 export default function ProductHero({
   product }: { product: PublicProduct }) {
   const t = useT();
+  const locale = useLocale();
   const images = galleryUrls(product);
-  const highlights = productHighlights(product);
+  const highlights = productHighlights(product, locale);
   const pdf = publicPdfUrl(product);
-  const hasSpecs = visibleSpecGroups(product).length > 0;
+  const hasSpecs = visibleSpecGroups(product, locale).length > 0;
   const tag =
     product.category === Category.TRACTOR
       ? product.series
-      : publicSubcategoryLabel(product.subcategory) || product.series;
+      : publicSubcategoryLabel(product.subcategory, locale) || product.series;
   const summary = product.shortDescription?.trim() || null;
 
   return (

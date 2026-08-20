@@ -4,9 +4,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { SERVICES } from "@/lib/site-content";
+import { servicesList } from "@/lib/site-content";
 import { SectionIndex } from "@/components/ui/SectionIndex";
 import { DURATION, EASE } from "@/lib/motion";
 import type { HomeSectionRecord } from "@/lib/home-section-types";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
 
 const SERVICE_IMAGES = [
   "/images/home/brand-story.jpg",
@@ -17,11 +19,14 @@ const SERVICE_IMAGES = [
 ];
 
 export default function ServicesSection({ section }: { section?: HomeSectionRecord }) {
+  const t = useT();
+  const locale = useLocale();
+  const services = servicesList(locale);
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
   const image = SERVICE_IMAGES[active] ?? SERVICE_IMAGES[0];
-  const title = section?.title || "Nga zgjedhja te servisi.";
-  const eyebrow = section?.eyebrow || "Shërbimet";
+  const title = section?.title || t.home.servicesHeadline;
+  const eyebrow = section?.eyebrow || t.nav.services;
 
   return (
     <section id="sherbimet" className="section-pad bg-white text-ink">
@@ -33,7 +38,7 @@ export default function ServicesSection({ section }: { section?: HomeSectionReco
               {title}
             </h2>
             <div className="mt-6">
-              {SERVICES.map((service, i) => (
+              {services.map((service, i) => (
                 <button
                   key={service.title}
                   type="button"

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import UsedTractorDetail from "@/components/used/UsedTractorDetail";
-import { robotsDirective, usedTractorMetadata } from "@/lib/seo";
+import JsonLd from "@/components/seo/JsonLd";
+import { robotsDirective, usedTractorBreadcrumbJsonLd, usedTractorJsonLd, usedTractorMetadata } from "@/lib/seo";
 import { getPublicUsedTractorBySlug, isUsedTractorsEnabled } from "@/lib/used-tractors";
 
 export const dynamic = "force-dynamic";
@@ -25,5 +26,11 @@ export default async function UsedTractorPage({ params }: { params: Promise<{ sl
   const { slug } = await params;
   const item = await getPublicUsedTractorBySlug(slug);
   if (!item) notFound();
-  return <UsedTractorDetail item={item} />;
+  return (
+    <>
+      <JsonLd data={usedTractorJsonLd(item)} />
+      <JsonLd data={usedTractorBreadcrumbJsonLd(item)} />
+      <UsedTractorDetail item={item} />
+    </>
+  );
 }

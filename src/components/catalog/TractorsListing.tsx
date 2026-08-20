@@ -1,3 +1,5 @@
+"use client";
+
 import { Suspense } from "react";
 import PageHero from "@/components/pages/PageHero";
 import CatalogToolbar from "@/components/catalog/CatalogToolbar";
@@ -5,6 +7,7 @@ import TractorFilters from "@/components/filters/TractorFilters";
 import ProductGrid from "@/components/product/ProductGrid";
 import type { PublicPageHero } from "@/lib/page-cms";
 import type { PublicProduct } from "@/lib/types";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function TractorsListing({
   hero,
@@ -17,6 +20,7 @@ export default function TractorsListing({
   seriesOptions: string[];
   stageOptions: string[];
 }) {
+  const t = useT();
   return (
     <div className="bg-ivory text-ink">
       <PageHero page={hero} />
@@ -27,22 +31,22 @@ export default function TractorsListing({
         </Suspense>
 
         <div className="min-w-0 flex-1">
-          <h2 className="sr-only">Modelet e traktorëve</h2>
+          <h2 className="sr-only">{t.productList.tractorsTitle}</h2>
           <p className="mb-3 text-sm text-ink/55">
-            {products.length} {products.length === 1 ? "model" : "modele"}
+            {products.length} {products.length === 1 ? t.productList.model : t.productList.models}
           </p>
           <div className="mb-5">
             <Suspense>
-              <CatalogToolbar hidePrice showFilters searchPlaceholder="Kërko traktor..." />
+              <CatalogToolbar hidePrice showFilters searchPlaceholder={t.productList.searchTractors} />
             </Suspense>
           </div>
 
           {products.length > 0 ? (
-            <ProductGrid products={products} layout="tractors" />
+            <ProductGrid products={products} />
           ) : (
             <div className="border border-ink/10 bg-warm-white px-6 py-16 text-center">
-              <p className="font-display text-2xl font-semibold">Aktualisht nuk ka produkte në këtë kategori.</p>
-              <p className="mt-3 text-base text-ink/55">Provo të ndryshosh filtrat ose kthehu te lista e plotë.</p>
+              <p className="font-display text-xl font-semibold">{t.productList.emptyTitle}</p>
+              <p className="mt-2 text-sm text-ink/55">{t.productList.emptyBody}</p>
             </div>
           )}
         </div>

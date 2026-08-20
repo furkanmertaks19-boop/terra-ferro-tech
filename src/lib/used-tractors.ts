@@ -2,11 +2,11 @@ import { Prisma, UsedTractorDrive, UsedTractorStatus } from "@prisma/client";
 import { prisma, withPrismaRetry } from "@/lib/prisma";
 import { getSiteSettings } from "@/lib/site-settings-data";
 import { getRequestLocale } from "@/lib/i18n/request";
-import { parseI18nBag, DEFAULT_LOCALE, type Locale } from "@/lib/i18n/config";
+import { parseI18nBag, type Locale } from "@/lib/i18n/config";
 import { str } from "@/lib/i18n/content";
-import { usedTractorPath } from "@/lib/i18n/routing";
+import { usedTractorCover, usedTractorGallery, usedTractorHref, usedTractorLabel } from "@/lib/used-tractor-path";
 
-export const USED_TRACTORS_PATH = "/traktore-te-perdorur";
+export { usedTractorCover, usedTractorGallery, usedTractorHref, usedTractorLabel };
 
 export const PUBLIC_USED_STATUSES: UsedTractorStatus[] = [
   UsedTractorStatus.FOR_SALE,
@@ -40,29 +40,6 @@ export type PublicUsedTractor = {
   updatedAt: Date;
   i18n?: unknown;
 };
-
-export function usedTractorHref(slug: string, locale: Locale = DEFAULT_LOCALE) {
-  return usedTractorPath(slug, locale);
-}
-
-export function usedTractorLabel(item: { brand: string; model: string }) {
-  return `${item.brand} ${item.model}`.replace(/\s+/g, " ").trim();
-}
-
-export function usedTractorCover(item: { coverImage: string | null; images: string[] }) {
-  return item.coverImage || item.images.find(Boolean) || null;
-}
-
-export function usedTractorGallery(item: { coverImage: string | null; images: string[] }) {
-  const seen = new Set<string>();
-  const urls: string[] = [];
-  for (const url of [item.coverImage, ...item.images]) {
-    if (!url || seen.has(url)) continue;
-    seen.add(url);
-    urls.push(url);
-  }
-  return urls;
-}
 
 export async function isUsedTractorsEnabled() {
   const settings = await getSiteSettings();

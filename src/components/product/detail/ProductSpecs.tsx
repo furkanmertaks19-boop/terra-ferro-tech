@@ -4,12 +4,12 @@ import type { PublicProduct } from "@/lib/types";
 import { visibleSpecGroups } from "@/lib/specs";
 import { Reveal } from "@/components/motion/Reveal";
 import { productContainer, productEyebrow, productSection, productTitle } from "./product-shell";
-import { useT } from "@/components/i18n/LocaleProvider";
+import { useT, useLocale } from "@/components/i18n/LocaleProvider";
 
 export default function ProductSpecs({
   product }: { product: PublicProduct }) {
   const t = useT();
-  const groups = visibleSpecGroups(product);
+  const groups = visibleSpecGroups(product, useLocale());
   if (groups.length === 0) return null;
 
   return (

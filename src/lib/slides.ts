@@ -6,6 +6,7 @@ import { getRequestLocale } from "@/lib/i18n/request";
 import { parseI18nBag } from "@/lib/i18n/config";
 import { str } from "@/lib/i18n/content";
 import { localizeHref } from "@/lib/i18n/routing";
+import { localizeKnownUi } from "@/lib/i18n/phrases";
 
 export type { AdminSlide } from "./slide-types";
 
@@ -63,14 +64,14 @@ export async function getActiveHomeSlides(): Promise<PublicHeroSlide[]> {
       const secondaryUrl = str(copy.secondaryButtonUrl, row.secondaryButtonUrl);
       return {
         id: row.id,
-        eyebrow: str(copy.eyebrow, row.eyebrow),
-        title: str(copy.title, row.title),
-        subtitle: str(copy.subtitle, row.subtitle),
+        eyebrow: localizeKnownUi(str(copy.eyebrow, row.eyebrow), locale),
+        title: localizeKnownUi(str(copy.title, row.title), locale),
+        subtitle: localizeKnownUi(str(copy.subtitle, row.subtitle), locale),
         desktopImage: row.desktopImage,
         mobileImage: row.mobileImage,
-        primaryButtonText: str(copy.primaryButtonText, row.primaryButtonText),
+        primaryButtonText: localizeKnownUi(str(copy.primaryButtonText, row.primaryButtonText), locale),
         primaryButtonUrl: !primaryUrl || primaryUrl.startsWith("#") ? primaryUrl : localizeHref(primaryUrl, locale),
-        secondaryButtonText: str(copy.secondaryButtonText, row.secondaryButtonText),
+        secondaryButtonText: localizeKnownUi(str(copy.secondaryButtonText, row.secondaryButtonText), locale),
         secondaryButtonUrl: !secondaryUrl || secondaryUrl.startsWith("#") ? secondaryUrl : localizeHref(secondaryUrl, locale),
         contentPosition: isSlidePosition(row.contentPosition) ? row.contentPosition : "left-center",
         overlayOpacity: Math.min(85, Math.max(0, row.overlayOpacity)),

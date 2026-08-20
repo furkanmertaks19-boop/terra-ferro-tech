@@ -1,22 +1,27 @@
+"use client";
+
 import LocaleLink from "@/components/i18n/LocaleLink";
 import Image from "next/image";
-import { ArrowUpRight } from "@phosphor-icons/react/ssr";
+import { ArrowUpRight } from "@phosphor-icons/react";
 import { productHref, productImageAlt } from "@/lib/product-path";
 import { coverUrl, type PublicProduct } from "@/lib/types";
 import ProductBadges from "./ProductBadges";
 import QuoteButton from "./QuoteButton";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
 
 export default function TractorCard({ product }: { product: PublicProduct; index?: number }) {
   const cover = coverUrl(product);
+  const t = useT();
+  const locale = useLocale();
   const parts = [
     product.horsePower != null ? `${product.horsePower} HP` : null,
-    product.hasCabin ? "Kabinë" : "ROPS",
+    product.hasCabin ? t.productDetail.cabin : t.productDetail.rops,
     product.stage,
   ].filter(Boolean);
 
   return (
     <article className="group flex h-full min-w-0 flex-col border border-ink/10 bg-warm-white transition-[border-color] duration-300 ease-out-expo hover:border-tractor-red/45">
-      <LocaleLink href={productHref(product)} className="flex min-w-0 flex-1 flex-col">
+      <LocaleLink href={productHref(product, locale)} className="flex min-w-0 flex-1 flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-[#e8e3d8]">
           <ProductBadges
             isNew={product.isNew}
@@ -35,7 +40,7 @@ export default function TractorCard({ product }: { product: PublicProduct; index
           ) : (
             <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
               <p className="text-[13px] tracking-[0.16em] uppercase text-ink/35">Terra Ferro Tech</p>
-              <p className="text-sm text-ink/40">Imazhi së shpejti</p>
+              <p className="text-sm text-ink/40">{t.productDetail.noImage}</p>
             </div>
           )}
         </div>
@@ -46,7 +51,7 @@ export default function TractorCard({ product }: { product: PublicProduct; index
           <h3 className="mt-2 font-display text-xl font-semibold tracking-tight sm:text-2xl">{product.name}</h3>
           <p className="mt-1 text-sm text-ink/55 sm:text-base">{parts.join(" · ")}</p>
           <span className="mt-auto inline-flex items-center gap-2 pt-4 text-[12px] font-semibold tracking-[0.12em] uppercase sm:pt-5 sm:text-[13px]">
-            Shiko Modelin
+            {t.home.viewModel}
             <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>
         </div>

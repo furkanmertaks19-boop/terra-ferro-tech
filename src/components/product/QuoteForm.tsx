@@ -22,7 +22,7 @@ export default function QuoteForm({
   const { contact } = useQuote();
 
   const whatsappText = encodeURIComponent(
-    productLabel ? `Përshëndetje, jam i interesuar për ${productLabel}.` : "Përshëndetje, dua informacion."
+    productLabel ? t.quoteForm.whatsappInterest.replace("{product}", productLabel) : t.quoteForm.whatsappGeneric,
   );
 
   if (state.success) {

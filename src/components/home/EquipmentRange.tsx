@@ -8,6 +8,7 @@ import { SectionIndex } from "@/components/ui/SectionIndex";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export default function EquipmentRange({
   items,
@@ -16,12 +17,13 @@ export default function EquipmentRange({
   items: RangeItem[];
   section?: HomeSectionRecord;
 }) {
+  const t = useT();
   if (!items.length) return null;
-  const title = section?.title || "Makineri për tokën.";
-  const body = section?.body || "Kultivatorë, rotovatorë, plugje dhe pajisje nga katalogu.";
-  const ctaLabel = section?.ctaLabel || "Shiko Makineritë";
+  const title = section?.title || t.home.equipmentHeadline;
+  const body = section?.body || t.home.equipmentBody;
+  const ctaLabel = section?.ctaLabel || t.home.viewEquipment;
   const ctaHref = section?.ctaHref || "/makineri-bujqesore";
-  const eyebrow = section?.eyebrow || "Makineri Bujqësore";
+  const eyebrow = section?.eyebrow || t.nav.equipment;
 
   return (
     <section className="bg-ivory py-20 text-ink md:py-[96px]">
